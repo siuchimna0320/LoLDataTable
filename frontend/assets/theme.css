@@ -1,0 +1,150 @@
+/* 英雄聯盟電競數據平台 — 深色電競主題 */
+:root {
+  --bg: #0b1020;
+  --panel: #131a2a;
+  --panel-2: #0e1526;
+  --border: #22304a;
+  --text: #e6ecf5;
+  --muted: #8a97ab;
+  --blue: #4c8dff;
+  --red: #f05a6a;
+  --gold: #f5b945;
+  --green: #4caf7a;
+}
+
+* { box-sizing: border-box; }
+
+body {
+  margin: 0;
+  background: var(--bg);
+  color: var(--text);
+  font-family: "Microsoft JhengHei", "Noto Sans TC", sans-serif;
+  font-size: 13px;
+}
+
+/* 頂部標題列 */
+.app-header {
+  display: flex; align-items: center; gap: 14px;
+  padding: 10px 18px;
+  background: linear-gradient(180deg, #101a30, #0b1020);
+  border-bottom: 1px solid var(--border);
+  position: sticky; top: 0; z-index: 100;
+}
+.app-logo {
+  font-size: 17px; font-weight: 700; color: var(--text);
+  display: flex; align-items: center; gap: 8px; white-space: nowrap;
+}
+.app-logo .dot { color: var(--gold); }
+.data-time { color: var(--muted); font-size: 12px; margin-left: auto; white-space: nowrap; }
+
+/* 頁籤導航 */
+.nav-pills { display: flex; gap: 6px; flex-wrap: wrap; padding: 8px 14px;
+  background: var(--panel-2); border-bottom: 1px solid var(--border); }
+.nav-pills a {
+  color: var(--muted); text-decoration: none;
+  padding: 6px 14px; border-radius: 16px; font-size: 13px;
+  border: 1px solid transparent; transition: all .15s;
+}
+.nav-pills a:hover { color: var(--text); background: #1b2740; }
+.nav-pills a.active {
+  color: #fff; background: linear-gradient(135deg, #3a6cff, #5b4bff);
+  border-color: #6b86ff;
+}
+
+/* 全域篩選列 */
+.filter-bar {
+  display: flex; flex-wrap: wrap; gap: 10px; align-items: center;
+  padding: 10px 16px; background: var(--panel);
+  border-bottom: 1px solid var(--border);
+}
+.filter-item { display: flex; flex-direction: column; gap: 3px; min-width: 130px; }
+.filter-item label { font-size: 11px; color: var(--muted); }
+.filter-item .dash-dropdown, .filter-item .DateRangePicker,
+.filter-item input[type="number"] { font-size: 12px; }
+
+/* 版面容器 */
+.page { padding: 16px; }
+.panel {
+  background: var(--panel); border: 1px solid var(--border);
+  border-radius: 10px; padding: 14px 16px; margin-bottom: 14px;
+}
+.panel-title {
+  font-size: 14px; font-weight: 700; margin: 0 0 10px 0;
+  display: flex; align-items: center; gap: 8px;
+}
+.panel-title .tag {
+  font-size: 11px; color: var(--gold); border: 1px solid var(--gold);
+  border-radius: 4px; padding: 0 6px; font-weight: 400;
+}
+.grid-2 { display: grid; grid-template-columns: 1fr 1fr; gap: 14px; }
+.grid-3 { display: grid; grid-template-columns: repeat(3, 1fr); gap: 14px; }
+.grid-kpi { display: grid; grid-template-columns: repeat(4, 1fr); gap: 14px; }
+
+/* KPI 卡 */
+.kpi-card {
+  background: linear-gradient(160deg, #16213a, #0f1626);
+  border: 1px solid var(--border); border-radius: 10px; padding: 12px 16px;
+}
+.kpi-label { color: var(--muted); font-size: 12px; }
+.kpi-value { font-size: 26px; font-weight: 700; margin-top: 4px; }
+.kpi-sub { color: var(--muted); font-size: 11px; margin-top: 2px; }
+.text-blue { color: var(--blue); } .text-red { color: var(--red); }
+.text-gold { color: var(--gold); } .text-green { color: var(--green); }
+
+/* 迷你榜單 */
+.mini-list { display: flex; flex-direction: column; gap: 6px; }
+.mini-row { display: flex; align-items: center; gap: 8px; font-size: 12px; }
+.mini-row .rank { color: var(--muted); width: 20px; text-align: right; }
+.mini-row .name { flex: 1; }
+.mini-row .val.up { color: var(--red); }
+.mini-row .val.down { color: var(--blue); }
+
+/* 頭像 */
+.champ-icon { border-radius: 6px; border: 1px solid #2c3c5e; display: inline-block;
+  vertical-align: middle; object-fit: cover; }
+.champ-cell { display: inline-flex; align-items: center; gap: 6px; }
+
+/* 英雄池卡片 */
+.roster-grid { display: grid; grid-template-columns: repeat(5, 1fr); gap: 12px; }
+.player-card { background: var(--panel-2); border: 1px solid var(--border);
+  border-radius: 10px; padding: 10px; }
+.player-card .pname { font-weight: 700; margin-bottom: 6px; }
+.pool-row { display: flex; align-items: center; gap: 6px; font-size: 11px;
+  padding: 2px 0; }
+.pool-row .pname-c { flex: 1; overflow: hidden; text-overflow: ellipsis;
+  white-space: nowrap; }
+
+/* BP 棋盤 */
+.bp-board { display: grid; grid-template-columns: 1fr 1fr; gap: 14px; }
+.bp-side { border-radius: 10px; padding: 10px; min-height: 120px; }
+.bp-blue { background: rgba(76,141,255,.10); border: 1px solid rgba(76,141,255,.4); }
+.bp-red { background: rgba(240,90,106,.10); border: 1px solid rgba(240,90,106,.4); }
+.bp-slot { display: inline-flex; align-items: center; justify-content: center;
+  width: 52px; height: 52px; margin: 3px; border-radius: 8px;
+  background: #0a1020; border: 1px dashed #3a4a6e; cursor: pointer; }
+.bp-slot.filled { border-style: solid; }
+.bp-slot.ban { filter: grayscale(1); position: relative; }
+
+/* 空狀態 */
+.empty-state {
+  border: 1px dashed var(--border); border-radius: 10px;
+  padding: 40px; text-align: center; color: var(--muted);
+}
+.empty-state h3 { color: var(--text); margin-top: 0; }
+
+/* 響應式 */
+@media (max-width: 1000px) {
+  .grid-2, .grid-3, .grid-kpi, .roster-grid, .bp-board {
+    grid-template-columns: 1fr; }
+  .app-header { flex-wrap: wrap; }
+}
+
+/* Dash 表格深色化 */
+.dash-table-container .dash-spreadsheet-container,
+.dash-table-container .dash-spreadsheet-inner,
+.dash-table-container .dash-spreadsheet,
+.dash-table-container .cell-table, .dash-table-tooltip {
+  --border: #22304a;
+}
+.dash-table-container .previous-next-container,
+.dash-table-container .page-number { color: var(--muted) !important; }

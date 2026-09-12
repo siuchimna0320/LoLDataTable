@@ -1,0 +1,29 @@
+# 本機／通用部署用 compose。
+# TrueNAS 專用版本（含 pool 掛載路徑）見 deploy/truenas/docker-compose.yml
+services:
+  lol-dashboard:
+    build: .
+    image: lol-dashboard:latest
+    container_name: lol-dashboard
+    restart: unless-stopped
+    ports:
+      # 本機開發用：監聽所有介面。對外（如 Tailnet）部署請改用
+      # deploy/truenas/docker-compose.yml，僅綁定 Tailscale IP。
+      - "8050:8050"
+    environment:
+      DATA_ROOT: /data
+      TZ: Asia/Taipei
+    volumes:
+      # 主機 ./backend/data ↔ 容器 /data，重啟後數據保留
+      - ./backend/data:/data
+    healthcheck:
+      test: ["CMD", "python", "-c",
+             "import urllib.request,sys; sys.exit(0 if urllib.request.urlopen('http://127.0.0.1:8050/', timeout=5).status == 200 else 1)"]
+      interval: 60s
+      timeout: 10s
+      retries: 3
+
+# 容器內手動更新數據指令：
+#   docker exec lol-dashboard python -m backend.pipeline all
+# 首次灌入歷史年份：
+#   docker exec lol-dashboard python -m backend.pipeline all --all-years

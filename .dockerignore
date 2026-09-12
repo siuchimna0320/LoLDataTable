@@ -1,0 +1,20 @@
+# 版本控制與編輯器
+.git/
+.gitignore
+.trae/
+.vscode/
+
+# 數據與產物（由 /data 卷掛載，不入映像）
+backend/data/
+
+# Python 快取
+__pycache__/
+*.pyc
+*.pyo
+.pytest_cache/
+
+# 參考圖、文件與本機暫存
+frontend/refrence/
+deploy/
+*.md
+*.log

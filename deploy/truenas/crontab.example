@@ -1,0 +1,4 @@
+# TrueNAS SCALE：系統設定 → 進階 → Cron Jobs（或編輯 /etc/crontab 後重啟 cron）
+# 每 12 小時（00:00、12:00）更新一次數據
+# 把 <POOL> 取代為實際 pool 名稱，並把腳本放到對應 dataset 的 scripts/ 下
+0 0,12 * * * root /mnt/<POOL>/lol-data/scripts/update-pipeline.sh >> /mnt/<POOL>/lol-data/logs/cron.log 2>&1

@@ -1,0 +1,25 @@
+# TrueNAS SCALE 專用 compose
+# 部署前請把 <POOL> 取代為你的 pool 名稱（例如 tank）
+services:
+  lol-dashboard:
+    # 映像需先在專案根目錄以 docker build -t lol-dashboard:latest . 建置
+    image: lol-dashboard:latest
+    container_name: lol-dashboard
+    restart: unless-stopped
+    ports:
+      # 安全預設：僅綁定 Tailscale 介面位址（把 <TAILSCALE_IP> 換成
+      # Tailscale 管理頁顯示的 100.x.x.x），避免對區網/外網暴露。
+      # 若需本機除錯可暫改 "127.0.0.1:8050:8050"。
+      - "<TAILSCALE_IP>:8050:8050"
+    environment:
+      DATA_ROOT: /data
+      TZ: Asia/Taipei
+    volumes:
+      # 數據 dataset 掛載：/mnt/<POOL>/lol-data ↔ /data
+      - /mnt/<POOL>/lol-data:/data
+    healthcheck:
+      test: ["CMD", "python", "-c",
+             "import urllib.request,sys; sys.exit(0 if urllib.request.urlopen('http://127.0.0.1:8050/', timeout=5).status == 200 else 1)"]
+      interval: 60s
+      timeout: 10s
+      retries: 3

@@ -1,0 +1,21 @@
+# Python
+__pycache__/
+*.py[cod]
+.venv/
+venv/
+*.egg-info/
+
+# 數據產物（原始 CSV / 倉儲 / 圖示 / 日誌不透過版控管理）
+backend/data/warehouse/
+backend/data/processed/
+backend/data/assets/
+backend/data/logs/
+backend/data/OraclesElixir/
+
+# 測試產物（截圖由回歸腳本重新產生）
+backend/tests/artifacts/
+
+# 系統/編輯器
+.DS_Store
+.vscode/
+.idea/
