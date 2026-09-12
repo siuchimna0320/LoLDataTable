@@ -27,12 +27,17 @@ LOGS_DIR = DATA_ROOT / "logs"
 WAREHOUSE_PATH = WAREHOUSE_DIR / "lol.duckdb"
 LATEST_JSON = PROCESSED_DIR / "latest.json"
 DD_META_PATH = ASSETS_DIR / "ddragon_meta.json"
+DD_STATIC_DIR = ASSETS_DIR / "ddragon"      # 圖鑑 JSON 與圖示快取
+COMPENDIUM_JSON = DD_STATIC_DIR / "compendium.json"
+JUNGLE_DIR = ASSETS_DIR / "jungle"          # 刷野編纂表快取
+JUNGLE_JSON = JUNGLE_DIR / "jungle_clear.json"
 
 # 數據片段（供儀表板分頁載入，避免每頁重掃全量）
 SLICE_DIR = PROCESSED_DIR / "slices"
 
 for _dir in (RAW_DIR, WAREHOUSE_DIR, PROCESSED_DIR, ASSETS_DIR,
-             CHAMP_ICON_DIR, LOGS_DIR, SLICE_DIR):
+             CHAMP_ICON_DIR, DD_STATIC_DIR, JUNGLE_DIR, LOGS_DIR,
+             SLICE_DIR):
     _dir.mkdir(parents=True, exist_ok=True)
 
 # ---------------------------------------------------------------------------
@@ -58,6 +63,47 @@ DDRAGON_CHAMPION_FULL_URL = (
 DDRAGON_SQUARE_URL = (
     "https://ddragon.leagueoflegends.com/cdn/{version}/img/champion/{champ_id}.png"
 )
+# 圖鑑靜態資料（道具／召喚師技能／符文，皆無須 API Key）
+DDRAGON_ITEM_URL = (
+    "https://ddragon.leagueoflegends.com/cdn/{version}/data/en_US/item.json"
+)
+DDRAGON_SUMMONER_URL = (
+    "https://ddragon.leagueoflegends.com/cdn/{version}/data/en_US/summoner.json"
+)
+DDRAGON_RUNES_URL = (
+    "https://ddragon.leagueoflegends.com/cdn/{version}/data/en_US/runesReforged.json"
+)
+DDRAGON_ITEM_ICON_URL = (
+    "https://ddragon.leagueoflegends.com/cdn/{version}/img/item/{icon}"
+)
+DDRAGON_SPELL_ICON_URL = (
+    "https://ddragon.leagueoflegends.com/cdn/{version}/img/spell/{icon}"
+)
+# 符文圖示使用無版本的 /cdn/img/（版本化路徑在新版會 404）
+DDRAGON_PERK_ICON_URL = (
+    "https://ddragon.leagueoflegends.com/cdn/img/{icon}"
+)
+# 單一英雄技能資料（Q/W/E 圖示檔名由此取得）
+DDRAGON_CHAMP_PAGE_URL = (
+    "https://ddragon.leagueoflegends.com/cdn/{version}"
+    "/data/en_US/champion/{champ_id}.json"
+)
+
+# ---------------------------------------------------------------------------
+# Jungle Clear Compilation 社群刷野編纂表（本機維護的 xlsx 副本）
+# 原始試算表：gid=1938238048 為 S16 分頁
+# ---------------------------------------------------------------------------
+JUNGLE_SHEET_ID = "1jE8bnlnIJnmWv9pnVW9veMKRXJNaaJf5tneQB3xUkbI"
+JUNGLE_SHEET_GID = "1938238048"
+JUNGLE_XLSX_PATH = (
+    DATA_ROOT / "jungle_clear_time"
+    / "Jungle Clear Compilation S16_2026.xlsx"
+)
+JUNGLE_SHEET_PAGE_URL = (
+    "https://docs.google.com/spreadsheets/d/"
+    f"{JUNGLE_SHEET_ID}/edit?gid={JUNGLE_SHEET_GID}#gid={JUNGLE_SHEET_GID}"
+)
+JUNGLE_DISCORD_URL = "https://discord.com/invite/c9yzQWtYy2"
 
 # 歷史遺留名稱 → DDragon 顯示名（自動映射失敗時的人工補充表）
 CHAMPION_NAME_OVERRIDES: dict[str, str] = {}

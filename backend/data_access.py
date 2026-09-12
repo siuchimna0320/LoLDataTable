@@ -258,6 +258,95 @@ def team_streaks(f: Filter, top_n: int = 5) -> dict:
 
 
 # ---------------------------------------------------------------------------
+# 積分榜（由對戰記錄推算；OE 無官方積分，大場＝同日同對手分組的系列賽）
+# ---------------------------------------------------------------------------
+def standings_groups(f: Filter) -> pd.DataFrame:
+    """篩選範圍內可用的賽區/年份/賽段與場數。"""
+    where, params = _game_where(f)
+    return _run_df(
+        "SELECT league, year, "
+        "COALESCE(NULLIF(split, ''), '未分賽段') AS split, COUNT(*) games "
+        f"FROM games{where} GROUP BY 1,2,3 "
+        "ORDER BY year DESC, league, split", params
+    )
+
+
+def _series_rows(f: Filter) -> pd.DataFrame:
+    """組出每個系列賽每隊一列：場數、勝場數。"""
+    where, params = _game_where(f)
+    sql = f"""
+        WITH g AS (SELECT * FROM games{where}),
+        team_rows AS (
+            SELECT g.date_iso, g.league, g.year,
+                   COALESCE(NULLIF(g.split, ''), '未分賽段') AS split,
+                   g.playoffs,
+                   t.teamname AS team,
+                   CASE WHEN t.side='Blue' THEN g.red_team
+                        ELSE g.blue_team END AS opponent,
+                   t.result AS won, t.gameid
+            FROM g JOIN team_games t ON t.gameid = g.gameid
+        )
+        SELECT date_iso, league, year, split, playoffs, team, opponent,
+               COUNT(*) games_n, SUM(won) wins_n
+        FROM team_rows
+        GROUP BY 1,2,3,4,5,6,7
+        ORDER BY date_iso
+    """
+    return _run_df(sql, params)
+
+
+def _streak(rows: pd.DataFrame) -> tuple[int, str]:
+    """依時間序計算當前連勝/連敗場數（大場）。"""
+    count, kind = 0, ""
+    for outcome in rows["outcome"]:
+        if outcome == kind:
+            count += 1
+        else:
+            count, kind = 1, outcome
+    return count, kind
+
+
+def standings(f: Filter, include_playoffs: bool = False) -> pd.DataFrame:
+    """各賽區/賽段戰隊積分榜：大場勝負、小場勝負、淨勝場、當前連勢。"""
+    series = _series_rows(f)
+    if series.empty:
+        return series
+    if not include_playoffs:
+        series = series[series["playoffs"].fillna(0).astype(int) == 0]
+    # 系列賽勝負：勝場逾半即拿下大場（BO1 必有勝方）
+    series["outcome"] = [
+        "W" if w * 2 > g else ("L" if w * 2 < g else "D")
+        for w, g in zip(series["wins_n"], series["games_n"])]
+    records = []
+    group_cols = ["league", "year", "split", "team"]
+    for keys, grp in series.groupby(group_cols, sort=False):
+        grp = grp.sort_values("date_iso")
+        series_w = int((grp["outcome"] == "W").sum())
+        series_l = int((grp["outcome"] == "L").sum())
+        series_d = int((grp["outcome"] == "D").sum())
+        game_w = int(grp["wins_n"].sum())
+        game_l = int(grp["games_n"].sum() - game_w)
+        streak_n, streak_type = _streak(grp)
+        records.append({
+            "league": keys[0], "year": int(keys[1]), "split": keys[2],
+            "team": keys[3], "series_w": series_w, "series_l": series_l,
+            "series_d": series_d, "game_w": game_w, "game_l": game_l,
+            "game_diff": game_w - game_l,
+            "win_rate": round(game_w / max(game_w + game_l, 1) * 100,
+                              config.RATE_DECIMALS),
+            "streak_n": streak_n, "streak_type": streak_type,
+        })
+    out = pd.DataFrame(records)
+    out = out.sort_values(
+        ["league", "year", "split", "series_w", "game_diff", "game_w"],
+        ascending=[True, False, True, False, False, False]
+    ).reset_index(drop=True)
+    # 各賽段獨立排名
+    out["rank"] = out.groupby(["league", "year", "split"]).cumcount() + 1
+    return out
+
+
+# ---------------------------------------------------------------------------
 # 近況
 # ---------------------------------------------------------------------------
 def recent_series(f: Filter, limit: int = 50) -> list[dict]:
@@ -325,18 +414,20 @@ def champion_stats(f: Filter, min_games: int = 0) -> pd.DataFrame:
     )
     df = picks.merge(bans, on="champion", how="left").fillna({"bans": 0})
     df["win_rate"] = (df["wins"] / df["games"] * 100).round(config.RATE_DECIMALS)
-    # 藍/紅方勝率（該方有出賽才計算，避免除以零）
-    df["blue_win_rate"] = (df["blue_wins"] / df["blue_games"].replace(0, pd.NA)
-                           * 100).round(config.RATE_DECIMALS)
-    df["red_win_rate"] = (df["red_wins"] / df["red_games"].replace(0, pd.NA)
-                          * 100).round(config.RATE_DECIMALS)
+    # 藍/紅方勝率（該方有出賽才計算，0 場轉 NaN；勿用 pd.NA，否則 object.round 爆 NAType）
+    blue_denom = df["blue_games"].where(df["blue_games"] != 0)
+    red_denom = df["red_games"].where(df["red_games"] != 0)
+    df["blue_win_rate"] = (df["blue_wins"] / blue_denom * 100).round(
+        config.RATE_DECIMALS)
+    df["red_win_rate"] = (df["red_wins"] / red_denom * 100).round(
+        config.RATE_DECIMALS)
     df["ban_rate"] = (df["bans"] / max(total_games, 1) * 100).round(
         config.RATE_DECIMALS)
     df["pick_rate"] = (df["games"] / max(total_games, 1) * 100).round(
         config.RATE_DECIMALS)
     df["bp_rate"] = (df["pick_rate"] + df["ban_rate"]).round(config.RATE_DECIMALS)
-    df["kda"] = ((df["kills"] + df["assists"]) /
-                 df["deaths"].replace(0, pd.NA)).round(2).fillna(
+    death_denom = df["deaths"].where(df["deaths"] != 0)
+    df["kda"] = ((df["kills"] + df["assists"]) / death_denom).round(2).fillna(
         (df["kills"] + df["assists"])).round(2)
     df["wins"] = df["wins"].astype(int)
     df["bans"] = df["bans"].astype(int)
@@ -373,8 +464,8 @@ def player_stats(f: Filter, min_games: int = 0) -> pd.DataFrame:
     if df.empty:
         return df
     df["win_rate"] = (df["wins"] / df["games"] * 100).round(config.RATE_DECIMALS)
-    df["kda"] = ((df["kills"] + df["assists"]) /
-                 df["deaths"].replace(0, pd.NA)).round(2).fillna(
+    death_denom = df["deaths"].where(df["deaths"] != 0)
+    df["kda"] = ((df["kills"] + df["assists"]) / death_denom).round(2).fillna(
         (df["kills"] + df["assists"])).round(2)
     df["wins"] = df["wins"].astype(int)
     return df

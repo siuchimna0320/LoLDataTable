@@ -72,6 +72,18 @@ def main(argv: list[str] | None = None) -> int:
         if args.stage in ("all", "assets"):
             logger.info("=== 階段 4/4：圖示同步 ===")
             assets_sync.run(force=args.force)
+            # 圖鑑靜態資料（版本/道具/召喚師/符文）；失敗時沿用快取，不中斷管線
+            try:
+                from backend import ddragon_data
+                ddragon_data.build_bundle()
+            except Exception as exc:  # noqa: BLE001
+                logger.warning("圖鑑靜態資料更新失敗（沿用快取）：%s", exc)
+            # 社群刷野編纂表；失敗時沿用快取
+            try:
+                from backend import jungle_data
+                jungle_data.build_cache()
+            except Exception as exc:  # noqa: BLE001
+                logger.warning("刷野編纂表更新失敗（沿用快取）：%s", exc)
 
     except Exception as exc:
         logger.exception("管線失敗：%s", exc)

@@ -1,4 +1,4 @@
-"""Plotly Dash 主程式：11 頁導航、全域篩選、本機英雄頭像路由。
+"""Plotly Dash 主程式：12 頁導航、全域篩選、本機資源圖示路由。
 
 啟動：python frontend/app.py（由專案根目錄）
 """
@@ -36,6 +36,20 @@ server = app.server
 @server.route("/champ-img/<path:filename>")
 def serve_champ_icon(filename: str):
     return send_from_directory(config.CHAMP_ICON_DIR, filename)
+
+
+# ---------------------------------------------------------------------------
+# Data Dragon 圖鑑圖示路由（伺服器端按需代理並快取，瀏覽器不直連外網）
+# ---------------------------------------------------------------------------
+@server.route("/dd-img/<group>/<path:filename>")
+def serve_dd_icon(group: str, filename: str):
+    from flask import abort
+    from backend import ddragon_data
+
+    path = ddragon_data.icon_path(group, filename)
+    if path is None:
+        abort(404)
+    return send_from_directory(path.parent, path.name)
 
 
 # ---------------------------------------------------------------------------

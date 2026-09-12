@@ -51,6 +51,12 @@
 2. **m14 年份 2027 提示**：年份篩選未來年份的 tooltip 引導未加；現有資料至 2026 年，不影響使用。
 3. **FR-15 系列賽分組視圖**：比賽 BP 頂部 KPI（場數/紅藍勝率/先選方勝率）已完成，BO 系列賽的局數分組卡片未做，建議與 m5 一併排入下版。
 
-## 5. 最終結論
+## 5. Chrome 試行補記（2026-09-12）
+
+上線試行時發現一個漏網缺陷：**英雄頁於 UI 預設篩選（2026 年、最少場數 0）下整表空白**，伺服器回報 `TypeError: type NAType doesn't define __round__ method`。原因是藍/紅方勝率與 KDA 的分母防零寫法 `replace(0, pd.NA)` 使 Series 變成 object 夾帶 NAType，`.round()` 逐元素捨入時爆炸；既有冒煙皆用 min_games ≥ 5 且多為全期間篩選，未覆蓋單一方 0 場的邊際列。
+
+修復（[data_access.py](file:///c:/Users/wwwsi/Desktop/my_project/backend/data_access.py) `champion_stats()`/`player_stats()`）：分母改以 `.where(分母 != 0)` 產出 float64 NaN 再運算；驗證腳本新增 4 個「2026 年、min_games=0」邊際案例，**validate 提升為 38/38 PASS**。Chrome 即時擷圖確認總覽/英雄/選手/戰隊/比賽BP/模擬BP 六頁皆正常渲染。教訓：頁面冒煙不能只等容器選擇器，需等待資料列實際出現（已記錄，後續測試應以資料列計數為準）。
+
+## 6. 最終結論
 
 規格 FR-1～23、NFR-1～7、AC-1～14 已全數實作並通過驗證；資料管道、11 頁 Dash 儀表板、Docker 構件、TrueNAS＋Tailscale 部署文件與 12 小時 Cron 腳本皆備，且以真實 13 年資料完成全量回歸。**准予結案**；保留三項低優先 UX 增強，建議於下一次迭代處理。
