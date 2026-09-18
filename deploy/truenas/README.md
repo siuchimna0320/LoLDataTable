@@ -41,6 +41,10 @@ docker compose up -d
 
 # 首次灌入 2014–今年全量歷史（約 1 GB，視網速需數十分鐘）
 docker exec lol-dashboard python -m backend.pipeline all --all-years
+
+# 首次回填 dpm.lol 職業積分（全部伺服器，每請求間隔 1.5 秒，約 1–3 小時）
+# 之後由排程增量更新；亦可於積分頁右上角按「⟳ SCRAPE」手動觸發
+docker exec lol-dashboard python -m scripts.scrape_dpm
 ```
 
 完成後開啟 `http://<TrueNAS-IP>:8050` 確認儀表板。
@@ -128,5 +132,7 @@ unset TS_AUTHKEY
 | 手動更新 | `docker exec lol-dashboard python -m backend.pipeline all` |
 | 只重建 JSON | `docker exec lol-dashboard python -m backend.pipeline aggregate` |
 | 重做全量倉儲 | `docker exec lol-dashboard python -m backend.pipeline clean` |
+| 手動爬 dpm 積分 | `docker exec lol-dashboard python -m scripts.scrape_dpm` |
+| dpm 爬蟲日誌 | `tail -f /data/warehouse/scrape.log` |
 | 重啟服務 | `cd /mnt/<POOL>/lol-data && docker compose restart` |
 | 更新映像 | 於專案目錄 `docker build -t lol-dashboard:latest . && docker compose up -d` |

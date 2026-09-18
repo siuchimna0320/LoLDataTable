@@ -282,18 +282,34 @@ def build_cache() -> dict:
     return payload
 
 
-@lru_cache(maxsize=1)
-def load_clears() -> dict | None:
-    """載入刷野資料：先解析本機 xlsx，失敗時回退最近 JSON 快取。"""
-    try:
-        return build_cache()
-    except Exception as exc:  # noqa: BLE001
-        logger.warning("本機刷野副本解析失敗（嘗試 JSON 快取）：%s", exc)
+def _cached_payload() -> dict | None:
+    """讀取磁碟上的 JSON 快取。"""
     if not config.JUNGLE_JSON.exists():
-        logger.error("刷野 JSON 快取不存在且本機副本無法讀取")
         return None
     try:
         return json.loads(config.JUNGLE_JSON.read_text(encoding="utf-8"))
     except json.JSONDecodeError:
         logger.error("刷野 JSON 快取毀損")
+        return None
+
+
+@lru_cache(maxsize=1)
+def load_clears() -> dict | None:
+    """載入刷野資料（每個伺服器進程僅計算一次）。
+
+    xlsx 未變更時直接複用 JSON 快取（毫秒級），變更才重新解析。
+    """
+    cached = _cached_payload()
+    try:
+        mtime = datetime.fromtimestamp(
+            config.JUNGLE_XLSX_PATH.stat().st_mtime)
+        if cached and cached.get("fetched_at") == mtime.isoformat(
+                timespec="seconds"):
+            return cached
+        return build_cache()
+    except Exception as exc:  # noqa: BLE001
+        logger.warning("本機刷野副本解析失敗（嘗試 JSON 快取）：%s", exc)
+        if cached:
+            return cached
+        logger.error("刷野 JSON 快取不存在且本機副本無法讀取")
         return None

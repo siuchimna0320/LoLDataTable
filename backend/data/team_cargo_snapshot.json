@@ -1,0 +1,307 @@
+{
+ "Anyone's Legend": {
+  "Short": "AL",
+  "Image": "Anyone's Legendlogo profile.png",
+  "Name": "Anyone's Legend"
+ },
+ "BNK FEARX": {
+  "Short": "FOX",
+  "Image": "BNK FEARXlogo profile.png",
+  "Name": "BNK FEARX"
+ },
+ "Bilibili Gaming": {
+  "Short": "BLG",
+  "Image": "Bilibili Gaminglogo profile.png",
+  "Name": "Bilibili Gaming"
+ },
+ "CTBC Flying Oyster": {
+  "Short": "CFO",
+  "Image": "CTBC Flying Oysterlogo square.png",
+  "Name": "CTBC Flying Oyster"
+ },
+ "Chiefs Esports Club": {
+  "Short": "CHF",
+  "Image": "Chiefs Esports Clublogo square.png",
+  "Name": "Chiefs Esports Club"
+ },
+ "Cloud9": {
+  "Short": "C9",
+  "Image": "Cloud9logo profile.png",
+  "Name": "Cloud9"
+ },
+ "DN SOOPers": {
+  "Short": "DNS",
+  "Image": "DN SOOPerslogo profile.png",
+  "Name": "DN SOOPers"
+ },
+ "Deep Cross Gaming": {
+  "Short": "DCG",
+  "Image": "Deep Cross Gaminglogo profile.png",
+  "Name": "Deep Cross Gaming"
+ },
+ "DetonatioN FocusMe": {
+  "Short": "DFM",
+  "Image": "DetonatioN FocusMelogo profile.png",
+  "Name": "DetonatioN FocusMe"
+ },
+ "Dignitas": {
+  "Short": "DIG",
+  "Image": "Dignitaslogo profile.png",
+  "Name": "Dignitas"
+ },
+ "Disguised": {
+  "Short": "DSG",
+  "Image": "Disguisedlogo profile.png",
+  "Name": "Disguised"
+ },
+ "Dplus Kia": {
+  "Short": "DK",
+  "Image": "Dplus Kialogo profile.png",
+  "Name": "Dplus Kia"
+ },
+ "EDward Gaming": {
+  "Short": "EDG",
+  "Image": "EDward Gaminglogo square.png",
+  "Name": "EDward Gaming"
+ },
+ "FURIA": {
+  "Short": "FUR",
+  "Image": "FURIAlogo profile.png",
+  "Name": "FURIA"
+ },
+ "Fluxo W7M": {
+  "Short": "W7M",
+  "Image": "Fluxo W7Mlogo square.png",
+  "Name": "Fluxo W7M"
+ },
+ "FlyQuest": {
+  "Short": "FLY",
+  "Image": "FlyQuestlogo profile.png",
+  "Name": "FlyQuest"
+ },
+ "Fnatic": {
+  "Short": "FNC",
+  "Image": "Fnaticlogo profile.png",
+  "Name": "Fnatic"
+ },
+ "Fukuoka SoftBank HAWKS gaming": {
+  "Short": "SHG",
+  "Image": "Fukuoka_SoftBank_HAWKS_gaminglogo_profile.png",
+  "Name": "Fukuoka SoftBank HAWKS gaming"
+ },
+ "G2 Esports": {
+  "Short": "G2",
+  "Image": "G2 Esportslogo profile.png",
+  "Name": "G2 Esports"
+ },
+ "GAM Esports": {
+  "Short": "GAM",
+  "Image": "GAM Esportslogo square.png",
+  "Name": "GAM Esports"
+ },
+ "Gen.G": {
+  "Short": "GEN",
+  "Image": "Gen.Glogo square.png",
+  "Name": "Gen.G"
+ },
+ "Ground Zero Gaming": {
+  "Short": "GZ",
+  "Image": "Ground Zero Gaminglogo square.png",
+  "Name": "Ground Zero Gaming"
+ },
+ "HANJIN BRION": {
+  "Short": "BRO",
+  "Image": "HANJIN BRIONlogo profile.png",
+  "Name": "HANJIN BRION"
+ },
+ "Hanwha Life Esports": {
+  "Short": "HLE",
+  "Image": "Hanwha Life Esportslogo profile.png",
+  "Name": "Hanwha Life Esports"
+ },
+ "Inferno Esports": {
+  "Short": "INF",
+  "Image": "Inferno Esports (Filipino Team)logo square.png",
+  "Name": "Inferno Esports"
+ },
+ "Invictus Gaming": {
+  "Short": "iG",
+  "Image": "Invictus Gaminglogo profile.png",
+  "Name": "Invictus Gaming"
+ },
+ "JD Gaming": {
+  "Short": "JDG",
+  "Image": "JD Gaminglogo profile.png",
+  "Name": "JD Gaming"
+ },
+ "KT Rolster": {
+  "Short": "KT",
+  "Image": "KT Rolsterlogo profile.png",
+  "Name": "KT Rolster"
+ },
+ "Karmine Corp": {
+  "Short": "KC",
+  "Image": "Karmine Corplogo profile.png",
+  "Name": "Karmine Corp"
+ },
+ "Kiwoom DRX": {
+  "Short": "DRX",
+  "Image": "Kiwoom DRXlogo profile.png",
+  "Name": "Kiwoom DRX"
+ },
+ "LGD Gaming": {
+  "Short": "LGD",
+  "Image": "LGD_logo.png",
+  "Name": "LGD Gaming"
+ },
+ "LNG Esports": {
+  "Short": "LNG",
+  "Image": "LNG Esportslogo square.png",
+  "Name": "LNG Esports"
+ },
+ "LOUD": {
+  "Short": "LOUD",
+  "Image": "LOUDlogo profile.png",
+  "Name": "LOUD"
+ },
+ "LYON": {
+  "Short": "LYON",
+  "Image": "LYON (2024 American Team)logo profile.png",
+  "Name": "LYON"
+ },
+ "Leviatan": {
+  "Short": "LEV",
+  "Image": "Leviatanlogo profile.png",
+  "Name": "Leviatan"
+ },
+ "LØS": {
+  "Short": "LOS",
+  "Image": "LØSlogo square.png",
+  "Name": "LØS"
+ },
+ "MGN Vikings Esports": {
+  "Short": "MGN",
+  "Image": "MGN Vikings Esportslogo profile.png",
+  "Name": "MGN Vikings Esports"
+ },
+ "MVK Esports": {
+  "Short": "MVK",
+  "Image": "MVK Esportslogo profile.png",
+  "Name": "MVK Esports"
+ },
+ "Movistar KOI": {
+  "Short": "KOI",
+  "Image": "Movistar KOIlogo square.png",
+  "Name": "Movistar KOI"
+ },
+ "Natus Vincere": {
+  "Short": "NAVI",
+  "Image": "Natus Vincerelogo square.png",
+  "Name": "Natus Vincere"
+ },
+ "Ninjas in Pyjamas": {
+  "Short": "NIP",
+  "Image": "Ninjas in Pyjamaslogo profile.png",
+  "Name": "Ninjas in Pyjamas"
+ },
+ "Nongshim RedForce": {
+  "Short": "NS",
+  "Image": "Nongshim RedForcelogo square.png",
+  "Name": "Nongshim RedForce"
+ },
+ "Oh My God": {
+  "Short": "OMG",
+  "Image": "Oh My Godlogo square.png",
+  "Name": "Oh My God"
+ },
+ "QT DIG∞": {
+  "Short": "QTD",
+  "Image": "QT DIGlogo profile.png",
+  "Name": "QT DIG∞"
+ },
+ "RED Canids": {
+  "Short": "RED",
+  "Image": "RED Canidslogo profile.png",
+  "Name": "RED Canids"
+ },
+ "SK Gaming": {
+  "Short": "SK",
+  "Image": "SK Gaminglogo profile.png",
+  "Name": "SK Gaming"
+ },
+ "Saving OCE": {
+  "Short": "SAV",
+  "Image": "Saving OCElogo square.png",
+  "Name": "Saving OCE"
+ },
+ "Sentinels": {
+  "Short": "SEN",
+  "Image": "Sentinelslogo profile.png",
+  "Name": "Sentinels"
+ },
+ "Shifters": {
+  "Short": "SHFT",
+  "Image": "Shifterslogo profile.png",
+  "Name": "Shifters"
+ },
+ "Shopify Rebellion": {
+  "Short": "SR",
+  "Image": "Shopify Rebellionlogo profile.png",
+  "Name": "Shopify Rebellion"
+ },
+ "T1": {
+  "Short": "T1",
+  "Image": "T1logo profile.png",
+  "Name": "T1"
+ },
+ "Team Heretics": {
+  "Short": "TH",
+  "Image": "Team Hereticslogo square.png",
+  "Name": "Team Heretics"
+ },
+ "Team Liquid": {
+  "Short": "TL",
+  "Image": "Team Liquidlogo profile.png",
+  "Name": "Team Liquid"
+ },
+ "Team Secret Whales": {
+  "Short": "TSW",
+  "Image": "Team Secret Whaleslogo profile.png",
+  "Name": "Team Secret Whales"
+ },
+ "Team Vitality": {
+  "Short": "VIT",
+  "Image": "Team Vitalitylogo square.png",
+  "Name": "Team Vitality"
+ },
+ "Team WE": {
+  "Short": "WE",
+  "Image": "Team WElogo profile.png",
+  "Name": "Team WE"
+ },
+ "ThunderTalk Gaming": {
+  "Short": "TT",
+  "Image": "ThunderTalk Gaminglogo profile.png",
+  "Name": "ThunderTalk Gaming"
+ },
+ "Top Esports": {
+  "Short": "TES",
+  "Image": "Top Esportslogo profile.png",
+  "Name": "Top Esports"
+ },
+ "Ultra Prime": {
+  "Short": "UP",
+  "Image": "Ultra Primelogo profile.png",
+  "Name": "Ultra Prime"
+ },
+ "Weibo Gaming": {
+  "Short": "WBG",
+  "Image": "Weibo Gaminglogo profile.png",
+  "Name": "Weibo Gaming"
+ },
+ "paiN Gaming": {
+  "Short": "PNG",
+  "Image": "PaiN Gaminglogo square.png",
+  "Name": "paiN Gaming"
+ }
+}

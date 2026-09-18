@@ -134,7 +134,7 @@ body {
 
 /* 響應式 */
 @media (max-width: 1000px) {
-  .grid-2, .grid-3, .grid-kpi, .roster-grid, .bp-board {
+  .grid-2, .grid-3, .grid-kpi, .bp-board {
     grid-template-columns: 1fr; }
   .app-header { flex-wrap: wrap; }
 }
@@ -146,5 +146,904 @@ body {
 .dash-table-container .cell-table, .dash-table-tooltip {
   --border: #22304a;
 }
+.dash-table-tooltip { white-space: pre-line; max-width: 260px; line-height: 1.6; }
 .dash-table-container .previous-next-container,
 .dash-table-container .page-number { color: var(--muted) !important; }
+
+/* ===== 英雄頁：頁內篩選列 / 三視圖 / 簡介橫幅 ===== */
+.hero-filter-bar {
+  display: flex; flex-wrap: wrap; gap: 10px 12px; align-items: flex-start;
+  padding: 10px 14px;
+}
+.hero-filter-bar .filter-item { min-width: 100px; }
+.hero-reset-btn {
+  align-self: flex-end;
+  height: 32px; min-width: 40px; padding: 0 10px;
+  background: var(--panel-2); color: var(--gold);
+  border: 1px solid var(--gold); border-radius: 8px;
+  font-size: 13px; cursor: pointer; transition: all .15s;
+}
+.hero-reset-btn:hover { background: rgba(245,185,69,.12); }
+
+/* 表格／散布圖／積分 分段切換 */
+.hero-view-toggle { display: flex; gap: 4px; }
+.hero-view-toggle label {
+  display: inline-flex; align-items: center; gap: 4px;
+  padding: 6px 12px; margin: 0;
+  border: 1px solid var(--border); border-radius: 8px;
+  color: var(--muted); font-size: 12px; cursor: pointer;
+  background: var(--panel-2); transition: all .15s;
+  user-select: none; white-space: nowrap;
+}
+.hero-view-toggle label:hover { color: var(--text); }
+.hero-view-toggle input { display: none; }
+.hero-view-toggle label:has(input:checked) {
+  color: var(--gold); border-color: var(--gold);
+  background: rgba(245,185,69,.12); font-weight: 700;
+  box-shadow: 0 0 8px rgba(245,185,69,.25);
+}
+
+/* 簡介橫幅 */
+.hero-banner {
+  display: flex; align-items: center; gap: 12px; flex-wrap: wrap;
+  padding: 10px 16px; margin-bottom: 12px;
+  background: linear-gradient(180deg, #16203a, #101729);
+  border: 1px solid var(--border); border-radius: 10px;
+  font-size: 13px;
+}
+.hero-banner-title { font-size: 17px; font-weight: 700; color: #fff; }
+.hero-banner-count {
+  font-size: 16px; font-weight: 700; color: var(--gold);
+}
+.hero-banner-note { color: var(--muted); font-size: 12px; }
+
+/* 英雄表格圖示尺寸 */
+#champ-table td img { height: 24px; width: 24px; border-radius: 5px;
+  vertical-align: middle; }
+#champ-table td img[src*="/pos-img/"] { height: 15px; width: 15px;
+  margin-right: 2px; }
+
+/* 積分視圖 */
+.hero-score-table { width: 100%; border-collapse: collapse; font-size: 12px; }
+.hero-score-table th {
+  text-align: left; padding: 8px 10px; color: var(--muted);
+  border-bottom: 1px solid var(--border); background: #1a2540;
+}
+.hero-score-table td { padding: 6px 10px; border-bottom: 1px solid var(--border); }
+.hero-score-table tr:hover td { background: rgba(76,141,255,.06); }
+.hero-score-table .hs-rank { color: var(--muted); width: 36px; }
+.hero-score-table .champ-cell { display: inline-flex; align-items: center; }
+
+/* DatePicker 深色化 */
+.hero-filter-bar .DateInput_input {
+  background: var(--panel-2); color: var(--text);
+  border-radius: 6px; font-size: 11px;
+}
+.hero-filter-bar .DateRangePickerInput {
+  border: 1px solid var(--border); border-radius: 6px;
+  background: var(--panel-2);
+}
+.hero-filter-bar .DateRangePickerInput_arrow { color: var(--muted); }
+
+/* ===== 戰隊頁：雙隊對比 / 雷達 / 總表格 ===== */
+#team-radar-a, #team-radar-a .dash-dropdown-trigger {
+  border-color: var(--blue) !important;
+  box-shadow: 0 0 8px rgba(76,141,255,.25);
+}
+#team-radar-b, #team-radar-b .dash-dropdown-trigger {
+  border-color: var(--red) !important;
+  box-shadow: 0 0 8px rgba(240,90,106,.25);
+}
+#team-h2h label {
+  display: inline-flex; align-items: center; gap: 6px;
+  color: var(--text); cursor: pointer; user-select: none;
+}
+
+/* ===== 戰隊欄：真實 LOGO＋縮寫＋聯賽膠囊（markdown HTML 渲染） ===== */
+#team-table td .team-logo,
+#team-table td img.team-logo {
+  height: 24px; width: 24px; object-fit: contain;
+  vertical-align: middle; margin-right: 8px;
+  border-radius: 5px; display: inline-block;
+}
+#team-table .team-abbr {
+  font-weight: 800; font-size: 15px; color: var(--text);
+  letter-spacing: .5px; vertical-align: middle; margin-right: 8px;
+}
+#team-table .league-pill {
+  display: inline-block; vertical-align: middle;
+  padding: 2px 10px; border-radius: 999px;
+  font-size: 11px; font-weight: 700; letter-spacing: .5px;
+  border: 1px solid transparent; white-space: nowrap;
+}
+.lg-lcp  { color:#33D6C4; background:rgba(51,214,196,.12);  border-color:rgba(51,214,196,.35); }
+.lg-lpl  { color:#FF5A6A; background:rgba(255,90,106,.12);  border-color:rgba(255,90,106,.35); }
+.lg-lck  { color:#5B9DFF; background:rgba(91,157,255,.12);  border-color:rgba(91,157,255,.35); }
+.lg-lec  { color:#46B8FF; background:rgba(70,184,255,.12);  border-color:rgba(70,184,255,.35); }
+.lg-lcs  { color:#E8C26A; background:rgba(232,194,106,.12);  border-color:rgba(232,194,106,.35); }
+.lg-cblol{ color:#5BD87A; background:rgba(91,216,122,.12);   border-color:rgba(91,216,122,.35); }
+.lg-other{ color:var(--muted); background:rgba(255,255,255,.06);
+           border-color:rgba(255,255,255,.15); }
+
+/* ===== 雷達軸編輯器：12 槽雙欄＋紅 X ===== */
+.team-axis-title { color: var(--text); font-weight: 700; font-size: 13px; }
+.team-axis-reset {
+  margin-left: 8px; width: 30px; height: 28px; border-radius: 7px;
+  background: var(--panel-2); color: var(--text);
+  border: 1px solid var(--border); cursor: pointer; font-size: 14px;
+  transition: border-color .15s;
+}
+.team-axis-reset:hover { border-color: var(--blue); }
+.team-axis-grid {
+  display: grid; grid-template-columns: 1fr 1fr;
+  gap: 6px 14px; margin-top: 4px;
+}
+.team-axis-row { display: flex; align-items: center; gap: 6px; }
+.team-axis-row .dash-dropdown { flex: 1; min-width: 0; }
+.team-axis-clear {
+  flex-shrink: 0; width: 24px; height: 24px; border-radius: 6px;
+  background: rgba(240,90,106,.10); color: var(--red);
+  border: 1px solid rgba(240,90,106,.30);
+  cursor: pointer; font-size: 11px; line-height: 1;
+  display: inline-flex; align-items: center; justify-content: center;
+  transition: background .15s;
+}
+.team-axis-clear:hover { background: rgba(240,90,106,.25); }
+
+/* ===== 戰隊對比：左軸編輯器＋右雷達並排；窄屏改直向堆疊 ===== */
+/* 對比卡片固定約半頁高，雷達嚴格貼合容器，不可溢出到下方表格 */
+.team-radar-card {
+  height: clamp(360px, 50vh, 520px);
+  display: flex;
+  flex-direction: column;
+}
+.team-radar-card .panel-title { flex: none; }
+.team-compare-flex {
+  display: flex; align-items: stretch; gap: 18px;
+  flex: 1 1 auto; min-height: 0;
+}
+.team-axis-panel {
+  display: flex; flex-direction: column; gap: 8px;
+  width: 330px; flex-shrink: 0;
+  min-height: 0; overflow-y: auto;
+}
+.team-radar-wrap {
+  flex: 1 1 0; min-width: 0; min-height: 0;
+  height: 100%; overflow: hidden;
+}
+#team-radar { height: 100%; width: 100%; }
+@media (max-width: 1000px) {
+  .team-radar-card { height: auto; }
+  .team-compare-flex { flex-direction: column; flex: none; }
+  .team-axis-panel { width: 100%; height: auto; overflow: visible; }
+  .team-radar-wrap { width: 100%; flex: none; height: auto; }
+  #team-radar { height: 460px; }
+}
+
+/* ===== 選手頁：複用戰隊對比佈局，補 player 前綴元件 ===== */
+#player-radar-a, #player-radar-a .dash-dropdown-trigger {
+  border-color: var(--blue) !important;
+  box-shadow: 0 0 8px rgba(76,141,255,.25);
+}
+#player-radar-b, #player-radar-b .dash-dropdown-trigger {
+  border-color: var(--red) !important;
+  box-shadow: 0 0 8px rgba(240,90,106,.25);
+}
+#player-h2h label {
+  display: inline-flex; align-items: center; gap: 6px;
+  color: var(--text); cursor: pointer; user-select: none;
+}
+#player-radar { height: 100%; width: 100%; }
+@media (max-width: 1000px) {
+  #player-radar { height: 460px; }
+}
+/* 選手欄：隊伍縮寫＋姓名＋賽區膠囊 */
+#player-table .team-abbr {
+  font-weight: 800; font-size: 13px; color: var(--text);
+  letter-spacing: .5px; vertical-align: middle; margin-right: 6px;
+}
+#player-table .player-name {
+  font-weight: 700; font-size: 13px; color: var(--text);
+  vertical-align: middle; margin-right: 8px;
+}
+#player-table .league-pill {
+  display: inline-block; vertical-align: middle;
+  padding: 2px 10px; border-radius: 999px;
+  font-size: 11px; font-weight: 700; letter-spacing: .5px;
+  border: 1px solid transparent; white-space: nowrap;
+}
+/* KDA／贏線欄：主數值＋灰色括號小字 */
+#player-table .kda-main {
+  display: block; font-weight: 800; font-size: 13px;
+  font-variant-numeric: tabular-nums; line-height: 1.2;
+}
+#player-table .cell-sub {
+  display: block; font-size: 10px; color: var(--muted);
+  font-family: Consolas, "Courier New", monospace; line-height: 1.2;
+}
+/* 選手表數值欄等寬數字 */
+#player-table td:nth-last-child(-n+3) { font-variant-numeric: tabular-nums; }
+/* 戰隊表數值欄等寬數字 */
+#team-table td:nth-last-child(-n+3) { font-variant-numeric: tabular-nums; }
+
+/* ===== 陣容頁：五路選手英雄池卡片 ===== */
+/* 模式切換（職業賽／積分賽／職業生涯）segmented 按鈕 */
+.roster-mode { display: flex; gap: 6px; align-items: center; }
+.roster-mode label {
+  display: inline-flex; align-items: center; gap: 4px;
+  padding: 6px 12px; border-radius: 8px; cursor: pointer;
+  background: var(--panel-2); border: 1px solid var(--border);
+  color: var(--text-dim, #AEB9CC); font-size: 12px; font-weight: 700;
+  white-space: nowrap; user-select: none; transition: all .15s;
+}
+.roster-mode input[type="radio"] { display: none; }
+.roster-mode label:has(input:checked) {
+  background: rgba(245,185,69,.16); border-color: var(--gold, #F5B945);
+  color: var(--gold, #F5B945);
+  box-shadow: 0 0 10px rgba(245,185,69,.18);
+}
+/* 未選戰隊提示列（對照參考圖 1） */
+.roster-hint {
+  margin-top: 10px; padding: 10px 14px;
+  background: var(--panel-2); border: 1px solid var(--border);
+  border-radius: 10px; color: var(--muted); font-size: 13px;
+}
+/* 五卡並排 */
+.roster-grid { display: grid; grid-template-columns: repeat(5, minmax(0, 1fr));
+  gap: 12px; align-items: start; }
+.roster-card {
+  background: var(--panel-2); border: 1px solid var(--border);
+  border-radius: 12px; padding: 10px; min-width: 0;
+}
+.roster-card-title { display: flex; align-items: center; gap: 8px; }
+.roster-pos-icon {
+  flex: none; border-radius: 6px;
+  background: rgba(255,255,255,.05); padding: 2px;
+}
+/* 摘要統計列 */
+.roster-card-stats {
+  display: flex; flex-wrap: wrap; justify-content: flex-end;
+  gap: 4px 10px; margin: 8px 2px 6px;
+  font-size: 12px; color: var(--muted);
+}
+.roster-card-stats b { color: var(--text); font-size: 13px; margin-left: 2px; }
+/* 英雄池表格：英雄圖／場數／勝率／KDA／上次 */
+.roster-pool-head, .roster-pool-row {
+  display: grid; grid-template-columns: 38px repeat(4, 1fr);
+  align-items: center; column-gap: 4px;
+}
+.roster-pool-head {
+  padding: 4px 2px; font-size: 11px; color: var(--muted);
+  border-bottom: 1px solid var(--border); position: sticky; top: 0;
+  background: var(--panel-2); z-index: 1;
+}
+.roster-pool-body { max-height: 560px; overflow-y: auto; }
+.roster-pool-row {
+  padding: 4px 2px; font-size: 12px; font-weight: 700;
+  border-bottom: 1px solid rgba(255,255,255,.04);
+  font-variant-numeric: tabular-nums;
+}
+.roster-cell-champ { display: flex; justify-content: center; }
+.roster-cell { text-align: center; }
+.roster-head { font-weight: 700; }
+.roster-empty {
+  padding: 18px 8px; text-align: center; color: var(--muted);
+  font-size: 12px;
+}
+.roster-no-record { padding: 28px 8px; }
+@media (max-width: 1200px) {
+  .roster-grid { grid-template-columns: repeat(3, minmax(0, 1fr)); }
+}
+@media (max-width: 760px) {
+  .roster-grid { grid-template-columns: repeat(2, minmax(0, 1fr)); }
+}
+
+/* ===== 比賽 BP 頁：系列賽分組棋盤 ===== */
+.bp-panel { padding: 12px 14px; }
+.bp-title-row { display: flex; align-items: center; gap: 12px;
+  margin-bottom: 6px; flex-wrap: wrap; }
+.bp-title { font-size: 16px; font-weight: 800; color: var(--text); }
+.bp-title-meta { font-size: 12px; color: var(--gold, #F5B945); font-weight: 700; }
+.bp-title-hint { font-size: 11px; color: var(--muted); }
+/* KPI 摘要屑 */
+.bp-kpi-bar { display: flex; flex-wrap: wrap; gap: 6px 22px; margin-bottom: 10px;
+  font-size: 12px; color: var(--muted); }
+.bp-kpi b { color: var(--text); font-size: 13px; margin: 0 1px; }
+.bp-kpi-sub { color: var(--muted); font-size: 11px; margin-left: 3px; }
+/* 棋盤外框（表頭固定＋內容捲動） */
+.bp-table {
+  border: 1px solid var(--border); border-radius: 10px; overflow: hidden;
+  display: flex; flex-direction: column;
+}
+/* dcc.Loading 包覆層：讓捲動區填滿剩餘高度，spinner 疊在棋盤上 */
+.bp-loading-parent { flex: 1 1 auto; min-height: 0; display: flex; }
+.bp-loading-parent > .bp-loading {
+  flex: 1 1 auto; min-height: 0; display: flex; width: 100%;
+}
+.bp-loading-parent .bp-scroll { flex: 1 1 auto; }
+.bp-scroll {
+  max-height: calc(100vh - 282px); overflow: auto; min-width: 0;
+}
+/* 27 欄格線（表頭與每列共用）
+ * 欄位順序：局數/時長/勝/藍方/藍選擇/藍禁用1-5/藍路線1-5/
+ *           紅方/紅選擇/紅禁用1-5/紅路線1-5
+ * 英雄欄用 minmax + 1fr 平均分佈撐滿可用空間（下限貼近圖片尺寸減少留白）
+ */
+.bp-row {
+  display: grid;
+  grid-template-columns:
+    44px 52px 48px
+    64px 48px
+    repeat(5, minmax(42px, 1fr))
+    repeat(5, minmax(52px, 1fr))
+    64px 48px
+    repeat(5, minmax(42px, 1fr))
+    repeat(5, minmax(52px, 1fr));
+  align-items: center; min-height: 36px; min-width: 1380px;
+  font-size: 12px; border-bottom: 1px solid rgba(255,255,255,.04);
+}
+.bp-cell { padding: 2px 2px; display: flex; align-items: center;
+  justify-content: center; min-width: 0; }
+/* 勝方半邊淡色底（由 data-win 屬性控制；藍方 or 紅方側自動上色） */
+.bp-row[data-win="blue"] .bp-blue-side { background: rgba(76,141,255,.10); }
+.bp-row[data-win="red"] .bp-red-side { background: rgba(240,90,106,.10); }
+/* 頭空間隔：隊名＋徽章（隊名與徽章分開兩欄後，徽章欄只有徽章時居中） */
+.bp-side-name b { font-size: 12px; color: var(--text); font-weight: 800;
+  overflow: hidden; text-overflow: ellipsis; min-width: 0; }
+/* 27 欄新隊名縮寫樣式 */
+.bp-team-abbr { font-size: 12px; font-weight: 800; color: var(--text);
+  white-space: nowrap; }
+/* 無資料時英雄欄的空縮寫 */
+.bp-empty-champ {
+  display: inline-flex; align-items: center; justify-content: center;
+  width: 30px; height: 30px; font-size: 11px;
+  border-radius: 4px; background: #1b2740; color: var(--muted);
+}
+/* 表頭（固定於捲動區上方） */
+.bp-head-row {
+  min-height: 46px;
+  background: var(--panel-2, #0E1526);
+  border-bottom: 1px solid var(--border);
+}
+.bp-head-cell { display: flex; flex-direction: column; gap: 3px;
+  padding: 4px 4px; color: var(--muted); font-size: 11px; font-weight: 700;
+  align-items: stretch; min-height: 48px; }
+/* 表頭 label 置中（文字／position icon 共用）；label 與 input 間要 gap，
+ * 所以 label 必須是 block 才會撐出第二行位置 */
+.bp-col-name {
+  text-align: center; display: block; line-height: 15px; flex: 0 0 auto;
+}
+/* 空 label 格也要預留高度（否則比鄰格矮 → 看起來向上翹） */
+.bp-col-label-empty {
+  display: block; min-height: 15px; line-height: 15px; visibility: hidden;
+}
+/* 表頭裡的 position icon 也置中 */
+.bp-head-cell .bp-pos-icon {
+  display: block; margin: 0 auto;
+}
+.bp-head-mid { align-items: center; }
+.bp-col-input {
+  width: 100%; max-width: 96px; height: 22px; font-size: 11px;
+  background: #0E1526; color: var(--text); border: 1px solid var(--border);
+  border-radius: 5px; padding: 1px 6px; box-sizing: border-box;
+}
+.bp-col-input-empty {
+  display: inline-block; width: 100%; max-width: 96px; height: 22px;
+  border: 1px dashed rgba(138, 151, 171, 0.28); border-radius: 5px;
+  background: transparent;
+}
+.bp-col-input:focus { outline: none; border-color: var(--gold, #F5B945); }
+.bp-midgap { justify-content: center; padding: 0; }
+.bp-pos-row { display: flex; gap: 5px; }
+.bp-pos-icon { opacity: .85; }
+/* 局數／時長／勝方 */
+.bp-gameno { color: var(--muted); font-size: 11px; }
+.bp-length { font-variant-numeric: tabular-nums; color: #AEB9CC; }
+.bp-winner { font-weight: 800; font-size: 12px; justify-content: center;
+  white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+/* 隊名＋先選後選（同一列） */
+.bp-side-name { flex-direction: row; align-items: center; gap: 5px;
+  width: 100%; white-space: nowrap; }
+.bp-side-name b { font-size: 12px; color: var(--text); font-weight: 800;
+  overflow: hidden; text-overflow: ellipsis; min-width: 0; }
+.bp-fp, .bp-sp { flex: none;
+  font-size: 10px; font-weight: 700; border-radius: 8px; padding: 0 7px;
+  line-height: 16px;
+}
+.bp-fp { background: var(--gold, #F5B945); color: #0B1020; }
+.bp-sp { background: #22304A; color: #AEB9CC; }
+/* 選角／禁用格 */
+.bp-five { display: flex; gap: 2px; }
+.bp-pick, .bp-ban {
+  position: relative; line-height: 0;
+  display: inline-flex; align-items: center; justify-content: center;
+}
+.bp-pick .champ-icon, .bp-pick span:first-child:not(.bp-order) {
+  filter: grayscale(1) brightness(.82); border-radius: 5px; width: 42px;
+  height: 42px;
+}
+.bp-ban .champ-icon, .bp-ban > span {
+  filter: grayscale(1) brightness(.78); border-radius: 4px; width: 40px;
+  height: 40px;
+}
+.bp-order {
+  position: absolute; top: -6px; right: -6px; width: 14px; height: 14px;
+  border-radius: 50%; background: var(--gold, #F5B945); color: #0B1020;
+  font-size: 9px; font-weight: 800; line-height: 14px; text-align: center;
+}
+/* 禁用紅斜線：漸層直接畫出，不用 transform（避免數百個合成層） */
+.bp-ban::after {
+  content: ""; position: absolute; inset: -4px; pointer-events: none;
+  background: linear-gradient(to top right,
+    transparent calc(50% - 1.2px), rgba(240,90,106,.85) calc(50% - 1.2px),
+    rgba(240,90,106,.85) calc(50% + 1.2px), transparent calc(50% + 1.2px));
+}
+/* 系列賽標題列 */
+.bp-series-head {
+  display: flex; align-items: center; gap: 10px; flex-wrap: wrap;
+  min-width: 1114px; padding: 6px 12px;
+  background: #0C1322; border-top: 1px solid rgba(245,185,69,.25);
+  border-bottom: 1px solid var(--border);
+}
+.bp-series-date { font-size: 12px; font-weight: 800; color: var(--text);
+  font-variant-numeric: tabular-nums; }
+.bp-series-patch { font-size: 11px; color: var(--muted); }
+.bp-league-pill {
+  font-size: 10px; font-weight: 800; letter-spacing: .5px;
+  padding: 1px 7px; border-radius: 999px; white-space: nowrap;
+  background: rgba(76,141,255,.14); color: #8FB4FF;
+  border: 1px solid rgba(76,141,255,.35);
+}
+.bp-series-stage { font-size: 11px; color: var(--gold, #F5B945); }
+.bp-series-score { display: flex; align-items: center; gap: 7px; margin-left: 4px; }
+.bp-score-team { font-size: 13px; font-weight: 700; color: #AEB9CC; }
+.bp-score-team.is-win { color: var(--text); font-weight: 800; }
+.bp-score-n { font-size: 14px; font-weight: 800;
+  font-variant-numeric: tabular-nums; }
+.bp-score-dash { color: var(--muted); }
+.bp-more-note { padding: 14px; text-align: center; color: var(--muted);
+  font-size: 12px; }
+@media (max-width: 1100px) {
+  .bp-scroll { overflow-x: auto; }
+}
+
+/* =========================================================================
+   DPM 積分頁（圖1–圖5）
+   ========================================================================= */
+.dpm-page { min-width: 0; }
+.dpm-bar {
+  display: flex; align-items: center; gap: 8px; flex-wrap: wrap;
+  padding: 9px 14px; margin-bottom: 10px;
+  background: var(--panel); border: 1px solid var(--border);
+  border-radius: 12px;
+}
+.dpm-tabs {
+  display: flex; align-items: center; gap: 4px;
+  border: 1px solid var(--border); border-radius: 999px; padding: 3px;
+}
+.dpm-tab {
+  padding: 4px 14px; border-radius: 999px; font-size: 13px;
+  color: var(--muted); cursor: pointer; white-space: nowrap;
+}
+.dpm-tab.active {
+  color: var(--gold); font-weight: 700;
+  background: rgba(245, 185, 69, .16);
+  border: 1px solid rgba(245, 185, 69, .35);
+  padding: 3px 13px;
+}
+.dpm-tab.is-disabled { opacity: .45; cursor: not-allowed; }
+.dpm-bar-label { color: var(--muted); font-size: 12px; margin-left: 6px; }
+.dpm-pill-group { display: flex; align-items: center; gap: 7px; }
+.dpm-pill {
+  border: 1px solid var(--border); border-radius: 999px;
+  padding: 3px 13px; font-size: 13px; color: #c9d3e2; cursor: pointer;
+  background: rgba(255, 255, 255, .02); white-space: nowrap;
+  user-select: none;
+}
+.dpm-pill:hover { border-color: #3a4d72; color: #fff; }
+.dpm-pill.active {
+  background: linear-gradient(135deg, #5a97ff, #3d6fe0);
+  border-color: transparent; color: #fff; font-weight: 700;
+}
+.dpm-pill.is-disabled { opacity: .5; cursor: not-allowed; }
+.dpm-pill.is-disabled:hover { border-color: var(--border); color: #c9d3e2; }
+.dpm-pill[data-region="LCK"] { color: #6aa5ff; }
+.dpm-pill[data-region="LPL"] { color: #ff6b6b; }
+.dpm-pill[data-region="LCP"] { color: #4fd1c5; }
+.dpm-pill[data-region="LEC"] { color: #7cc4ff; }
+.dpm-pill[data-region="LCS"] { color: #f5b945; }
+.dpm-pill[data-region="CBLOL"] { color: #7bd88f; }
+.dpm-pill.active[data-region] { color: #fff; }
+.dpm-cup-divider { color: #3a4d72; margin: 0 2px; }
+.dpm-cup:nth-child(1) { color: #ff6b6b; }
+.dpm-cup:nth-child(2) { color: #f0a93c; }
+.dpm-cup:nth-child(3) { color: #b18cff; }
+.dpm-bar-spacer { flex: 1 1 auto; }
+.dpm-scrape-btn {
+  border: 1px solid rgba(76, 141, 255, .55); color: #bcd2ff;
+  background: rgba(76, 141, 255, .12); border-radius: 8px;
+  padding: 5px 12px; font-size: 12px; font-weight: 700; cursor: pointer;
+}
+.dpm-scrape-btn:hover { background: rgba(76, 141, 255, .25); }
+
+/* 頁首右上角：資料時間＋更新狀態＋手動更新按鈕 */
+.oracle-head-right {
+  display: flex; align-items: center; gap: 10px;
+  margin-left: auto; min-width: 0;
+}
+.oracle-head-right .data-time { margin-left: 0; }
+.oracle-update-state {
+  font-size: 12px; color: var(--muted); max-width: 380px;
+  overflow: hidden; text-overflow: ellipsis; white-space: nowrap;
+}
+.oracle-update-btn {
+  border: 1px solid rgba(76, 141, 255, .55); color: #bcd2ff;
+  background: rgba(76, 141, 255, .12); border-radius: 8px;
+  padding: 5px 12px; font-size: 12px; font-weight: 700; cursor: pointer;
+  white-space: nowrap;
+}
+.oracle-update-btn:hover:not(:disabled) { background: rgba(76, 141, 255, .25); }
+.oracle-update-btn:disabled { opacity: .55; cursor: default; }
+.dpm-scrape-state {
+  font-size: 12px; color: var(--muted); max-width: 320px;
+  overflow: hidden; text-overflow: ellipsis; white-space: nowrap;
+}
+.dpm-sub {
+  color: var(--muted); font-size: 12px; margin: 2px 4px 10px;
+}
+.dpm-sub a { color: #6aa5ff; text-decoration: none; }
+.dpm-sub a:hover { text-decoration: underline; }
+
+/* 每日戰況：日期子分頁＋資訊列 */
+.dpm-sub-daily {
+  display: flex; align-items: center; justify-content: space-between;
+  gap: 10px; flex-wrap: wrap;
+}
+.dpm-day-tabs { display: flex; align-items: center; gap: 6px; }
+.dpm-daily-info b.is-win { color: #5aa9ff; }
+.dpm-daily-info b.is-loss { color: #ff6b6b; }
+
+/* 每日戰況：六隊一列的戰隊卡片網格 */
+.dpm-ladder-host:has(.dpm-daily-grid) {
+  background: transparent; border: none; overflow: visible;
+}
+.dpm-daily-grid {
+  display: grid; gap: 12px;
+  grid-template-columns: repeat(6, minmax(0, 1fr));
+}
+.dt-card {
+  background: linear-gradient(180deg, rgba(35, 45, 68, .92),
+    rgba(27, 35, 54, .92));
+  border: 1px solid rgba(86, 110, 150, .28);
+  border-left: 2px solid rgba(96, 158, 255, .75);
+  border-radius: 12px; overflow: hidden;
+  box-shadow: 0 4px 14px rgba(0, 0, 0, .22);
+}
+.dt-card-head {
+  display: flex; align-items: baseline; gap: 8px;
+  padding: 10px 12px 8px;
+  border-bottom: 1px solid rgba(255, 255, 255, .06);
+}
+.dt-code {
+  color: #6aa5ff; font-size: 16px; font-weight: 800; letter-spacing: .3px;
+}
+.dt-region { color: var(--muted); font-size: 11.5px; }
+.dt-acd {
+  display: inline-block; margin-left: 2px; padding: 0 4px;
+  font-size: 10px; color: #8fa0bd; border: 1px solid var(--border);
+  border-radius: 4px; vertical-align: 1px;
+}
+.dt-team-wl {
+  margin-left: auto; color: #aebacb; font-size: 12.5px;
+  font-variant-numeric: tabular-nums; white-space: nowrap;
+}
+.dt-card-body { padding: 2px 0; }
+.dt-player {
+  padding: 7px 12px 8px;
+  border-bottom: 1px solid rgba(255, 255, 255, .045);
+}
+.dt-player:last-child { border-bottom: none; }
+.dt-player-head { display: flex; align-items: center; gap: 8px; }
+.dt-pos { width: 15px; height: 15px; flex: 0 0 auto; opacity: .85; }
+.dt-name {
+  color: #eef2f8; font-size: 13.5px; font-weight: 700;
+  text-decoration: none; white-space: nowrap;
+  overflow: hidden; text-overflow: ellipsis;
+}
+a.dt-name:hover { color: #8fb6ff; }
+.dt-rank {
+  margin-left: auto; font-size: 12.5px; font-weight: 700;
+  font-variant-numeric: tabular-nums; white-space: nowrap;
+}
+.dt-rank-none { color: var(--muted); font-weight: 400; }
+.dt-wl {
+  font-size: 14px; font-weight: 800; margin-left: 10px;
+  font-variant-numeric: tabular-nums; white-space: nowrap;
+}
+.dt-wl b.is-win, .dpm-daily-info b.is-win { color: #5aa9ff; }
+.dt-wl b.is-loss, .dpm-daily-info b.is-loss { color: #ff6b6b; }
+.dt-champs {
+  display: flex; flex-wrap: wrap; gap: 4px;
+  margin: 6px 0 1px 23px;
+}
+.dt-champ {
+  width: 32px; height: 32px; border-radius: 6px; object-fit: cover;
+  border: 2px solid transparent; background: rgba(0, 0, 0, .25);
+}
+.dt-champ.is-win { border-color: rgba(90, 169, 255, .9); }
+.dt-champ.is-loss { border-color: rgba(255, 107, 107, .9); }
+@media (max-width: 1500px) {
+  .dpm-daily-grid { grid-template-columns: repeat(4, minmax(0, 1fr)); }
+}
+@media (max-width: 1100px) {
+  .dpm-daily-grid { grid-template-columns: repeat(3, minmax(0, 1fr)); }
+}
+@media (max-width: 760px) {
+  .dpm-daily-grid { grid-template-columns: repeat(2, minmax(0, 1fr)); }
+}
+
+/* 積分榜表格 */
+.dpm-ladder-host {
+  background: var(--panel); border: 1px solid var(--border);
+  border-radius: 12px; overflow-x: auto;
+}
+.dpm-table { min-width: 1470px; }
+.dpm-head, .dpm-row {
+  display: grid; align-items: center; justify-items: center;
+  grid-template-columns: 42px minmax(160px, 1.6fr) 48px 96px 66px 118px
+    62px 138px 66px 232px 58px minmax(150px, 1.5fr) 74px;
+}
+.dpm-th {
+  width: 100%; padding: 10px 6px; font-size: 12.5px; color: #aebacb;
+  border-bottom: 1px solid var(--border); text-align: center;
+  white-space: nowrap;
+}
+.dpm-th.sortable { cursor: pointer; user-select: none; }
+.dpm-th.sortable:hover { color: #fff; }
+.dpm-arrow { color: var(--gold); font-size: 10px; }
+.dpm-row {
+  border-bottom: 1px solid rgba(34, 48, 74, .55);
+  min-height: 40px;
+}
+.dpm-row:hover { background: rgba(76, 141, 255, .06); }
+.dpm-row.is-pinned { background: rgba(245, 185, 69, .08); }
+.dpm-td {
+  width: 100%; padding: 7px 6px; font-size: 13px; text-align: center;
+  color: var(--text); white-space: nowrap;
+}
+.col-rank { color: #e8b85c; font-weight: 700; }
+.col-player {
+  justify-self: start; display: flex; align-items: center; gap: 6px;
+  padding-left: 14px; text-align: left;
+}
+.dpm-fav {
+  color: #6b7689; cursor: pointer; font-size: 14px; line-height: 1;
+  flex: 0 0 auto;
+}
+.dpm-fav:hover { color: var(--gold); }
+.dpm-fav.is-on { color: var(--gold); }
+.dpm-team-logo { width: 17px; height: 17px; border-radius: 3px; flex: 0 0 auto; }
+.dpm-player-link {
+  color: #dbe4f2; text-decoration: none; font-weight: 600;
+  overflow: hidden; text-overflow: ellipsis; white-space: nowrap;
+  max-width: 168px;
+}
+a.dpm-player-link:hover { color: #8fb6ff; text-decoration: underline; }
+.dpm-pos-icon { width: 19px; height: 19px; vertical-align: middle; }
+.col-tier { display: flex; align-items: center; justify-content: center; gap: 5px; }
+.dpm-rank-icon { width: 20px; height: 20px; }
+.dpm-muted { color: #6b7689; font-weight: 400; }
+.dpm-wk-sub { font-size: 11px; color: #8a97ab; }
+.col-champs { justify-self: center; }
+.dpm-champs { display: flex; align-items: center; gap: 3px; }
+.dpm-champ {
+  width: 20px; height: 20px; border-radius: 4px; object-fit: cover;
+  border: 1.5px solid transparent;
+}
+.dpm-champ.is-win { border-color: rgba(76, 175, 125, .85); }
+.dpm-champ.is-loss { border-color: rgba(240, 90, 106, .85); }
+.col-server { color: var(--muted); font-size: 12px; }
+.dpm-acct-link {
+  color: #8fb6ff; font-size: 12px; text-decoration: none;
+  overflow: hidden; text-overflow: ellipsis; white-space: nowrap;
+  display: inline-block; max-width: 180px; vertical-align: middle;
+}
+.dpm-acct-link:hover { text-decoration: underline; }
+
+/* 一週評分 hover 提示氣泡 */
+.dpm-cell-tip { position: relative; cursor: help; font-weight: 700; }
+.dpm-cell-tip::after {
+  content: attr(data-tip); position: absolute; bottom: 135%; left: 50%;
+  transform: translateX(-50%); width: 250px; padding: 8px 10px;
+  background: #0a1120; border: 1px solid #33507e; border-radius: 8px;
+  font-size: 11px; line-height: 1.55; font-weight: 400; color: #dfe7f4;
+  text-align: left; z-index: 40; opacity: 0; pointer-events: none;
+  transition: opacity .15s; white-space: normal;
+  box-shadow: 0 6px 24px rgba(0, 0, 0, .5);
+}
+.dpm-cell-tip:hover::after { opacity: 1; }
+
+/* 選手詳情頁（圖3–圖5） */
+.dpm-detail-bar {
+  display: flex; align-items: center; gap: 9px; flex-wrap: nowrap;
+  padding: 9px 14px; margin-bottom: 10px; overflow-x: auto;
+  background: var(--panel); border: 1px solid var(--border);
+  border-radius: 12px;
+}
+.dpm-mate-logo { width: 30px; height: 30px; border-radius: 5px; flex: 0 0 auto; }
+.dpm-mate {
+  display: inline-flex; align-items: center; gap: 6px; flex: 0 0 auto;
+  border: 1px solid var(--border); border-radius: 999px;
+  padding: 4px 13px 4px 8px; font-size: 13px; color: #c9d3e2;
+  text-decoration: none; white-space: nowrap;
+}
+.dpm-mate:hover { border-color: #3a4d72; color: #fff; }
+.dpm-mate.active {
+  background: linear-gradient(135deg, #5a97ff, #3d6fe0);
+  border-color: transparent; color: #fff; font-weight: 700;
+}
+.dpm-mate img { width: 17px; height: 17px; }
+.dpm-info-row {
+  display: flex; align-items: center; gap: 10px; flex-wrap: wrap;
+  padding: 10px 14px; margin-bottom: 8px;
+  background: var(--panel); border: 1px solid var(--border);
+  border-radius: 12px;
+}
+.dpm-info-name { font-size: 22px; font-weight: 800; }
+.dpm-info-pos { width: 26px; height: 26px; }
+.dpm-info-merge { color: var(--muted); font-size: 13px; }
+.dpm-acct-pill {
+  display: inline-flex; align-items: center; gap: 7px;
+  border: 1px solid var(--border); border-radius: 999px;
+  padding: 4px 13px; font-size: 12.5px; color: #d3dcee;
+  text-decoration: none;
+}
+.dpm-acct-pill:hover { border-color: #3a4d72; }
+.dpm-acct-pill .srv { color: var(--muted); font-size: 11px; }
+.dpm-acct-pill .lp { font-weight: 700; }
+.dpm-chip {
+  display: inline-flex; align-items: center; gap: 8px;
+  border: 1px solid var(--border); border-radius: 8px;
+  padding: 5px 12px; font-size: 12.5px; color: #aebacb;
+  background: rgba(255, 255, 255, .02);
+}
+.dpm-chip img { width: 18px; height: 18px; }
+.dpm-chip .x { color: #6b7689; font-size: 13px; }
+.dpm-match-host {
+  background: var(--panel); border: 1px solid var(--border);
+  border-radius: 12px; overflow-x: auto;
+}
+.dpm-match-table { min-width: 1720px; }
+.dpm-mrow {
+  display: grid; align-items: center; justify-items: center;
+  grid-template-columns: 92px 62px 78px 56px 128px 108px 64px
+    52px 76px 76px 62px 52px 104px 182px 74px;
+  border-bottom: 1px solid rgba(34, 48, 74, .55); min-height: 46px;
+}
+.dpm-mrow .dpm-mtd {
+  width: 100%; padding: 6px 4px; font-size: 12.5px; text-align: center;
+  white-space: nowrap;
+}
+.dpm-mrow.is-win {
+  background: linear-gradient(90deg, rgba(76, 141, 255, .14), transparent 30%);
+}
+.dpm-mrow.is-loss {
+  background: linear-gradient(90deg, rgba(240, 90, 106, .13), transparent 30%);
+}
+.dpm-mdate { display: flex; flex-direction: column; gap: 2px; font-size: 12px; }
+.dpm-mdate .res-win { color: #6aa5ff; font-weight: 700; }
+.dpm-mdate .res-loss { color: #ff6b6b; font-weight: 700; }
+.dpm-mdate .t { color: var(--muted); font-size: 11px; }
+.dpm-champ-cell { position: relative; display: inline-block; }
+.dpm-champ-cell > img { width: 30px; height: 30px; border-radius: 5px; }
+.dpm-champ-cell .duo {
+  position: absolute; right: -7px; bottom: -5px; width: 15px; height: 15px;
+  border-radius: 3px; border: 1.5px solid var(--panel);
+}
+.dpm-op-link { color: #8fb6ff; text-decoration: none; font-size: 12px; }
+.dpm-op-link:hover { text-decoration: underline; }
+.dpm-op-name { color: var(--muted); font-size: 12px; }
+.dpm-pos-diff { font-weight: 700; }
+/* 英雄圖鑑：英雄名超連結（進英雄詳情頁） */
+.champ-name-link {
+  color: #E6ECF5; text-decoration: none; display: block;
+}
+.champ-name-link:hover { color: #8AA7FF; text-decoration: underline; }
+
+/* =========================================================================
+   圖鑑分頁膠囊列（分區）
+   ========================================================================= */
+.comp-sections-bar {
+  display: flex; align-items: center; gap: 14px; flex-wrap: wrap;
+  padding: 12px 16px; background: var(--panel-2);
+  border: 1px solid var(--border); border-radius: 12px;
+}
+.comp-sections-label {
+  color: var(--muted); font-size: 14px; font-weight: 700;
+  letter-spacing: 2px; flex: none;
+}
+.comp-sections { display: flex; flex-wrap: wrap; gap: 10px; row-gap: 8px; }
+.comp-sections > div { display: inline-flex; }
+.comp-sections .comp-section-input { display: none; }
+.comp-sections .comp-section-pill {
+  display: inline-flex; align-items: center; margin: 0 !important;
+  padding: 7px 24px; border-radius: 18px; cursor: pointer;
+  font-size: 14px; color: var(--muted);
+  border: 1px solid rgba(255,255,255,.16);
+  background: transparent; transition: all .15s;
+}
+.comp-sections .comp-section-pill:hover { color: var(--text); }
+.comp-sections > div:has(input:checked) .comp-section-pill {
+  color: #fff; font-weight: 700;
+  background: linear-gradient(135deg, #3a6cff, #5b4bff);
+  border-color: #6b86ff;
+}
+
+/* =========================================================================
+   英雄圖鑑牆方格（頭像→名稱→BP→路線）
+   ========================================================================= */
+.champ-tile {
+  display: flex; flex-direction: column; align-items: center;
+  padding: 14px 6px 12px; min-width: 0;
+  background: linear-gradient(180deg, #141d33, #10182b);
+  border: 1px solid #1d2942; border-radius: 12px;
+  transition: border-color .15s;
+}
+.champ-tile:hover { border-color: #3a4f7a; }
+.champ-tile-avatar {
+  width: 68px; height: 68px; border-radius: 10px; object-fit: cover;
+  background: #1b2740;
+}
+.champ-tile-name {
+  width: 100%; margin-top: 10px; text-align: center;
+  font-size: 13px; font-weight: 700;
+  overflow: hidden; text-overflow: ellipsis; white-space: nowrap;
+}
+.champ-tile-bp {
+  margin-top: 8px; display: inline-flex; align-items: center;
+  font-size: 11.5px; color: #8A97AB; white-space: nowrap;
+}
+.champ-tile-lanes {
+  margin-top: 9px; display: flex; gap: 6px;
+}
+.champ-lane-tile {
+  width: 28px; height: 28px; border-radius: 7px;
+  background: #0c1322; border: 1px solid #26324d;
+  display: inline-flex; align-items: center; justify-content: center;
+}
+.dpm-pos-diff.up { color: #ff6b57; }
+.dpm-pos-diff.down { color: #4caf7d; }
+.dpm-tick { font-weight: 800; }
+.dpm-tick.yes { color: var(--gold); }
+.dpm-tick.no { color: #6b7689; }
+.dpm-icon-stack { display: flex; align-items: center; justify-content: center; gap: 3px; }
+.dpm-icon-stack img { width: 22px; height: 22px; border-radius: 4px; }
+.dpm-skill { letter-spacing: 1px; font-weight: 700; font-size: 12.5px; }
+.dpm-items { display: flex; align-items: center; justify-content: center; gap: 2px; }
+.dpm-items img { width: 24px; height: 24px; border-radius: 4px; }
+.dpm-items .slot {
+  width: 24px; height: 24px; border-radius: 4px;
+  background: rgba(255, 255, 255, .04);
+}
+.dpm-score { font-weight: 800; font-size: 14px; }
+.dpm-score .rk { color: var(--muted); font-size: 10px; font-weight: 400; }
+
+/* 詳情頁篩選彈窗 */
+.dpm-pop {
+  position: fixed; z-index: 60; max-height: 320px; overflow-y: auto;
+  min-width: 170px; background: #0c1322; border: 1px solid #33507e;
+  border-radius: 10px; padding: 5px;
+  box-shadow: 0 10px 30px rgba(0, 0, 0, .55);
+}
+.dpm-opt {
+  display: flex; align-items: center; gap: 8px; padding: 5px 9px;
+  border-radius: 7px; font-size: 12.5px; color: #d3dcee; cursor: pointer;
+}
+.dpm-opt:hover { background: rgba(76, 141, 255, .14); }
+.dpm-opt img { width: 20px; height: 20px; border-radius: 4px; }
+.dpm-opt span:nth-child(2) { flex: 1 1 auto;
+  overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+.dpm-opt .n { color: var(--muted); font-size: 11px; }
+.dpm-pop-empty { padding: 10px; color: var(--muted); font-size: 12px;
+  text-align: center; }
+

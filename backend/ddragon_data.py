@@ -94,6 +94,8 @@ def _trim_summoners(raw: dict) -> list[dict]:
         seen.add(name)
         spells.append({
             "id": info.get("id", ""),
+            # 數值 key 對應 Riot 戰績中的 summoner1Id／summoner2Id（如 4＝閃現）
+            "key": info.get("key", ""),
             "name": name,
             "icon": info.get("image", {}).get("full", ""),
             "cooldown": info.get("cooldownBurn", ""),
@@ -123,6 +125,35 @@ def _trim_runes(raw: list) -> list[dict]:
     return trees
 
 
+# OE 位置代碼 → CommunityDragon 路線圖示檔名
+POSITION_ICON_CODES = {"top": "top", "jng": "jungle", "mid": "middle",
+                       "bot": "bottom", "sup": "utility"}
+
+
+def position_icon_path(code: str) -> Path | None:
+    """五路位置 SVG 本機路徑；不存在則下載（含重試），失敗回 None。"""
+    remote = POSITION_ICON_CODES.get(code)
+    if not remote:
+        return None
+    target = config.POSITION_ICON_DIR / f"{code}.svg"
+    if target.exists() and target.stat().st_size > 0:
+        return target
+    try:
+        resp = http_get(
+            config.COMMUNITY_POSITION_ICON_URL.format(code=remote))
+        atomic_write_bytes(target, resp.content)
+        return target
+    except Exception as exc:  # noqa: BLE001
+        logger.warning("路線圖示下載失敗 %s：%s", code, exc)
+        return None
+
+
+def ensure_position_icons() -> None:
+    """預熱五路圖示（assets 排程用，失敗不影響主流程）。"""
+    for code in POSITION_ICON_CODES:
+        position_icon_path(code)
+
+
 def build_bundle(force: bool = False) -> dict:
     """下載並裁剪圖鑑資料，成功後原子寫入快取。"""
     version = _synced_version() or _online_json(versions=True)[0]
@@ -142,6 +173,10 @@ def build_bundle(force: bool = False) -> dict:
     logger.info("圖鑑靜態資料已更新：版本 %s、道具 %d、召喚師 %d、符文系 %d",
                 version, len(bundle["items"]), len(bundle["summoners"]),
                 len(bundle["runes"]))
+    try:
+        ensure_position_icons()
+    except Exception as exc:  # noqa: BLE001
+        logger.warning("路線圖示預熱失敗（不影響圖鑑）：%s", exc)
     return bundle
 
 

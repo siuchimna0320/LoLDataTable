@@ -12,9 +12,10 @@ WORKDIR /app
 COPY requirements.txt .
 RUN pip install --no-cache-dir -r requirements.txt
 
-# 複製前後端程式碼
+# 複製前後端程式碼與爬蟲腳本（cron 以 python -m scripts.scrape_dpm 呼叫）
 COPY backend ./backend
 COPY frontend ./frontend
+COPY scripts ./scripts
 
 # 數據卷（DuckDB 倉儲、JSON、英雄頭像、原始 CSV、日誌）
 RUN mkdir -p /data

@@ -14,7 +14,8 @@ import numpy as np
 import pandas as pd
 
 from backend import config, data_access
-from backend.metrics.scoring import score_champions
+from backend.metrics.scoring import (score_champions, score_champions_lane,
+                                     score_players, score_teams)
 from backend.pipeline.cleaner import read_year
 
 warnings.filterwarnings("ignore")
@@ -149,6 +150,126 @@ def validate_filters() -> None:
             print(f"       例外：{type(exc).__name__}: {exc}")
         (_passed if ok else _failed).append(f"NA 邊際 {name}")
         print(f"[{'PASS' if ok else 'FAIL'}] {name}：{rows} 列")
+
+    # 英雄排行（表格/散布圖/積分三視圖共用）
+    rank_cols = {"champion", "games", "wins", "bp_rate", "ban_rate",
+                 "win_rate", "lane_win", "late_rate", "kp", "kda",
+                 "gold15", "gpm", "dpm", "dtaken", "vspm", "positions",
+                 "main_position"}
+    try:
+        ranking = data_access.champion_ranking(ui_filter, 5)
+        missing = rank_cols - set(ranking.columns)
+        ranges_ok = (
+            len(ranking) > 0 and not missing
+            and ((ranking["bp_rate"] >= 0) & (ranking["bp_rate"] <= 100)).all()
+            and ((ranking["win_rate"] >= 0) &
+                 (ranking["win_rate"] <= 100)).all()
+        )
+        scored = score_champions_lane(ranking)
+        ranges_ok = ranges_ok and ((scored["lane_score"] >= 0) &
+                                   (scored["lane_score"] <= 100)).all()
+    except Exception as exc:  # noqa: BLE001
+        missing, ranges_ok = str(exc), False
+    (_passed if ranges_ok else _failed).append("英雄排行欄位與值域")
+    print(f"[{'PASS' if ranges_ok else 'FAIL'}] 英雄排行欄位與值域："
+          f"{'齊全' if ranges_ok else missing}")
+
+    # 戰隊/選手關鍵字過濾
+    try:
+        member_rows = len(data_access.champion_ranking(
+            ui_filter, member_search="Chovy"))
+        member_ok = member_rows > 0
+    except Exception:  # noqa: BLE001
+        member_ok = False
+    (_passed if member_ok else _failed).append("戰隊選手關鍵字過濾")
+    print(f"[{'PASS' if member_ok else 'FAIL'}] 戰隊選手關鍵字過濾："
+          f"{member_rows if member_ok else '例外'} 隻")
+
+    # 戰隊排行（戰隊頁雷達與 25 欄總表）
+    team_cols = {"teamname", "league", "games", "wins", "avg_len",
+                 "win_rate", "side_diff", "champ_pool", "tower_rate",
+                 "grub2_rate", "dragon_rate", "herald_rate", "dragons",
+                 "baron_rate", "gd10", "gold_mid", "team_gpm", "team_dpm",
+                 "kd", "k_pg", "d_pg", "vspm", "abbr", "logo_file"}
+    try:
+        teams = score_teams(data_access.team_ranking(ui_filter, 5))
+        missing_t = team_cols - set(teams.columns)
+        team_ok = (
+            len(teams) > 0 and not missing_t
+            and ((teams["win_rate"] >= 0) &
+                 (teams["win_rate"] <= 100)).all()
+            and ((teams["attack"] >= 0) & (teams["attack"] <= 100)).all()
+            and ((teams["defense"] >= 0) &
+                 (teams["defense"] <= 100)).all()
+            and ((teams["score"] >= 0) & (teams["score"] <= 100)).all()
+            and teams["abbr"].notna().all()
+        )
+        # h2h 需取同聯賽前兩名（跨聯賽隊伍可能從未對戰）
+        top_league = teams.groupby("league")["games"].sum().idxmax()
+        top2 = teams[teams["league"] == top_league].sort_values(
+            "games", ascending=False).head(2)["teamname"].tolist()
+        league_filter = data_access.Filter(
+            years=ui_filter.years, leagues=[top_league])
+        h2h = data_access.team_ranking(league_filter, min_games=0,
+                                       h2h_teams=(top2[0], top2[1]))
+        team_ok = team_ok and len(h2h) == 2
+    except Exception as exc:  # noqa: BLE001
+        missing_t, team_ok = str(exc), False
+    (_passed if team_ok else _failed).append("戰隊排行欄位與值域")
+    print(f"[{'PASS' if team_ok else 'FAIL'}] 戰隊排行欄位與值域："
+          f"{'齊全' if team_ok else missing_t}")
+
+    # 戰隊頁預設口徑：最新賽季六大頂級聯賽（排除 Versus 表演賽）應為 64 隊
+    try:
+        default_n = len(data_access.team_ranking(
+            data_access.default_team_filter()))
+        default_ok = default_n == 64
+    except Exception as exc:  # noqa: BLE001
+        default_n, default_ok = str(exc), False
+    (_passed if default_ok else _failed).append("戰隊預設口徑 64 隊")
+    print(f"[{'PASS' if default_ok else 'FAIL'}] 戰隊預設口徑 64 隊："
+          f"{default_n} 隊（最新賽季 {data_access.latest_top_year()}）")
+
+    # 選手頁預設口徑：最新賽季六大頂級聯賽，22 欄口徑欄位齊全且值域合理
+    try:
+        pdf = data_access.player_ranking(data_access.default_team_filter())
+        need_p = {
+            "playername", "abbr", "league", "position", "games", "wins",
+            "win_rate", "champ_pool", "kp", "kda", "k_pg", "d_pg", "a_pg",
+            "kda_diff10", "lane_win", "lane_gd15", "dmg_share",
+            "death_share", "fb_diff", "gold_eff", "gold_mid", "gpm",
+            "dpm", "dtaken", "vspm"}
+        missing_p = need_p - set(pdf.columns)
+        pdf2 = score_players(pdf)
+        player_ok = (
+            len(pdf) >= 300 and not missing_p
+            and ((pdf2["win_rate"] >= 0) &
+                 (pdf2["win_rate"] <= 100)).all()
+            and ((pdf2["attack"] >= 0) & (pdf2["attack"] <= 100)).all()
+            and ((pdf2["defense"] >= 0) &
+                 (pdf2["defense"] <= 100)).all()
+            and ((pdf2["score"] >= 0) & (pdf2["score"] <= 100)).all()
+            and pdf2["score"].max() >= 85
+            and pdf2["abbr"].notna().all()
+            # Versus 表演賽不應出現
+            and (pdf2["league"] != "Versus").all()
+        )
+        # h2h：取同聯賽中單場數前兩名，對戰口徑應只回傳這兩人
+        mid = pdf2[pdf2["position"] == "mid"].sort_values(
+            "games", ascending=False)
+        lg = mid.iloc[0]["league"]
+        pair = mid[mid["league"] == lg].head(2)["playername"].tolist()
+        lf = data_access.Filter(
+            years=data_access.default_team_filter().years, leagues=[lg],
+            positions=["mid"])
+        ph2h = data_access.player_ranking(
+            lf, min_games=0, h2h_players=(pair[0], pair[1]))
+        player_ok = player_ok and len(ph2h) == 2
+    except Exception as exc:  # noqa: BLE001
+        missing_p, player_ok = str(exc), False
+    (_passed if player_ok else _failed).append("選手排行欄位與值域")
+    print(f"[{'PASS' if player_ok else 'FAIL'}] 選手排行欄位與值域："
+          f"{'齊全' if player_ok else missing_p}")
 
 
 def validate_performance() -> None:
@@ -303,6 +424,122 @@ def validate_jungle() -> None:
           f"{with_icon}/{len(champions)}（{coverage:.0%}）")
 
 
+def validate_roster() -> None:
+    """陣容頁：戰隊解析、五路候選、選手英雄池口徑檢查。"""
+    print("\n== 7. 陣容頁 ==")
+    from backend import data_access as da
+
+    # 戰隊縮寫／全名精確解析（避免 T1 誤命中 T1 Academy）
+    checks = [
+        ("resolve_team('T1') = T1", da.resolve_team("T1") == "T1",
+         da.resolve_team("T1")),
+        ("resolve_team('GEN') = Gen.G", da.resolve_team("GEN") == "Gen.G",
+         da.resolve_team("GEN")),
+        ("resolve_team 亂數回傳 None", da.resolve_team("不存在的戰隊xyz")
+         is None, da.resolve_team("不存在的戰隊xyz")),
+    ]
+    # 最新賽季 T1 五位置皆有候選，首選＝該位置上次出賽日最新者
+    f_latest = da.Filter(years=[da.latest_top_year()])
+    cand = da.roster_candidates("T1", f_latest)
+    five_ok = set(da.ROSTER_POSITIONS) <= set(cand["position"])
+    checks.append(("T1 五路候選齊全", five_ok,
+                   sorted(cand["position"].unique())))
+    for pos in da.ROSTER_POSITIONS:
+        grp = cand[cand["position"] == pos].sort_values(
+            ["last_date", "games"], ascending=False)
+        ok = (not grp.empty and grp.iloc[0]["last_date"]
+              == grp["last_date"].max())
+        checks.append((f"T1 {pos} 首選上次日期最新", bool(ok),
+                       grp.iloc[0]["playername"] if not grp.empty else "無"))
+
+    # Faker 職業生涯：年份跨度、英雄池按場數降冪
+    s_all, pool_all = da.roster_player_detail(
+        "T1", "mid", "Faker", da.Filter())
+    checks += [
+        ("Faker 職業生涯跨年（y0<y1）", s_all["y0"] < s_all["y1"],
+         f"{s_all['y0']}-{s_all['y1']}"),
+        ("Faker 職業生涯總場 ≥ 500", s_all["games"] >= 500,
+         s_all["games"]),
+        ("英雄池按場數降冪",
+         bool(pool_all["games"].is_monotonic_decreasing),
+         pool_all["games"].head(3).tolist()),
+    ]
+    # 場數門檻：min_games=5 後列數減少且皆 ≥ 5
+    s5, pool5 = da.roster_player_detail(
+        "T1", "mid", "Faker", da.Filter(), min_games=5)
+    checks += [
+        ("min_games=5 過濾低場數英雄",
+         len(pool5) < len(pool_all) and (pool5["games"] >= 5).all(),
+         f"{len(pool_all)} → {len(pool5)}"),
+    ]
+    for name, ok, actual in checks:
+        (_passed if ok else _failed).append(name)
+        print(f"[{'PASS' if ok else 'FAIL'}] {name}：實際 {actual}")
+
+
+def validate_bp() -> None:
+    """比賽 BP 頁：系列賽分組、比分、蛇形選角順位與欄位篩選檢查。"""
+    print("\n== 8. 比賽 BP 頁 ==")
+    from backend import data_access as da
+
+    # 驗證用全量明細（不受前端渲染上限影響）
+    data = da.bp_board_data(da.Filter(years=[2026], leagues=["LCK"]),
+                            render_games=100000)
+    s = data["stats"]
+    checks = [
+        ("LCK 2026 有場次", s["games"] > 100, s["games"]),
+        ("場均時長為 mm:ss", ":" in s["avg_length"], s["avg_length"]),
+        ("藍紅勝場合計＝總場",
+         s["blue_wins"] + s["red_wins"] == s["games"],
+         f"{s['blue_wins']}+{s['red_wins']}/{s['games']}"),
+        ("BP 完整率 100%（LCK）", s["complete_pct"] == 100,
+         f"{s['complete_n']}/{s['games']}"),
+        ("系列數 > 0", s["series_total"] > 0, s["series_total"]),
+    ]
+    # T1 2-3 HLE（2026-09-02，五局）
+    t1 = [x for x in data["series"] if x["date"] == "2026-09-02"
+          and {x["abbr_a"], x["abbr_b"]} == {"T1", "HLE"}]
+    if t1:
+        g = t1[0]
+        checks += [
+            ("T1-HLE 系列 5 局", len(g["games"]) == 5, len(g["games"])),
+            ("比分 T1 2-3 HLE",
+             (g["score_a"], g["score_b"], g["winner"]) == (2, 3, "b"),
+             f"{g['abbr_a']} {g['score_a']}-{g['score_b']} {g['abbr_b']}"),
+            ("階段標籤 S3季後賽", g["stage"] == "S3季後賽", g["stage"]),
+        ]
+        # 第 1 局紅方先選 → 紅方順位 1,3,5,7,9
+        gm = g["games"][0]
+        red_orders = [p["order"] for p in gm["red_picks"]]
+        blue_orders = [p["order"] for p in gm["blue_picks"]]
+        checks += [
+            ("蛇形順位：紅先選紅為奇數",
+             set(red_orders) == {1, 3, 5, 7, 9} and
+             set(blue_orders) == {2, 4, 6, 8, 10},
+             f"red={sorted(red_orders)} blue={sorted(blue_orders)}"),
+            ("每邊各 5 選 5 禁",
+             len(gm["red_picks"]) == 5 and len(gm["red_bans"]) == 5
+             and len(gm["blue_picks"]) == 5 and len(gm["blue_bans"]) == 5,
+             "ok"),
+        ]
+    else:
+        checks.append(("找到 T1-HLE 09-02 系列", False, "缺"))
+    # 英雄欄位篩選會縮小場次（LCK 場次為基準，全聯盟 Azir 仍應有資料）
+    d2 = da.bp_board_data(da.Filter(years=[2026], leagues=["LCK"]),
+                          champ_kw="Azir")
+    checks.append(("英雄篩選（Azir）生效且縮小範圍",
+                   0 < d2["stats"]["games"] < s["games"],
+                   d2["stats"]["games"]))
+    # 紅方欄輸入縮寫 HLE 應命中 Hanwha Life Esports
+    d3 = da.bp_board_data(da.Filter(years=[2026], leagues=["LCK"]),
+                          red_kw="HLE", render_games=100000)
+    checks.append(("紅方縮寫篩選（HLE）命中", d3["stats"]["games"] > 0,
+                   d3["stats"]["games"]))
+    for name, ok, actual in checks:
+        (_passed if ok else _failed).append(name)
+        print(f"[{'PASS' if ok else 'FAIL'}] {name}：實際 {actual}")
+
+
 def main() -> int:
     validate_metrics()
     validate_filters()
@@ -310,6 +547,8 @@ def main() -> int:
     validate_latest_json()
     validate_standings_and_compendium()
     validate_jungle()
+    validate_roster()
+    validate_bp()
     print(f"\n結果：{len(_passed)} 通過 / {len(_failed)} 失敗")
     if _failed:
         print("失敗項目：", "、".join(_failed))

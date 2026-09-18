@@ -66,6 +66,8 @@ def make_filter(data: dict | None, **overrides) -> data_access.Filter:
         date_start=data.get("date_start") or None,
         date_end=data.get("date_end") or None,
         positions=data.get("positions") or None,
+        champion=(data.get("champion") or "").strip() or None,
+        member=(data.get("member") or "").strip() or None,
         **overrides,
     )
 
@@ -80,13 +82,15 @@ def kpi_card(label: str, value, sub: str = "", color: str = "text-gold") -> html
     )
 
 
-def panel(title: str, children, tag: str | None = None) -> html.Div:
+def panel(title: str, children, tag: str | None = None,
+          extra_class: str = "") -> html.Div:
+    class_name = "panel" + (f" {extra_class}" if extra_class else "")
     return html.Div([
         html.H2(className="panel-title", children=[
             title, html.Span(tag, className="tag") if tag else None
         ]),
         children,
-    ], className="panel")
+    ], className=class_name)
 
 
 def empty_state(title: str, desc: str) -> html.Div:
